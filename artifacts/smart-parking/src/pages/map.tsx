@@ -4,6 +4,7 @@ import {
   useUpdateSpot, 
   useCreateReservation, 
   useListVehicles,
+  useGetCurrentUser,
   getListSpotsQueryKey
 } from "@workspace/api-client-react";
 import type { SpotStatus, SpotType } from "@workspace/api-client-react";
@@ -165,6 +166,8 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStat
   const [isCreatingRes, setIsCreatingRes] = useState(false);
   
   const { data: vehicles } = useListVehicles();
+  const { data: currentUser } = useGetCurrentUser();
+  const isOperator = currentUser?.role === "operator";
   const createReservation = useCreateReservation();
   const queryClient = useQueryClient();
 
@@ -244,6 +247,7 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStat
       </div>
 
       <div className="space-y-6">
+        {isOperator && (
         <div>
           <h4 className="text-sm font-medium mb-3">Quick Actions</h4>
           <div className="grid grid-cols-2 gap-2">
@@ -285,6 +289,7 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStat
             </Button>
           </div>
         </div>
+        )}
 
         {spot.status === "available" && (
           <div className="border-t pt-6">

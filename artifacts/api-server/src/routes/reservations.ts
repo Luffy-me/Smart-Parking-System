@@ -15,6 +15,7 @@ import {
   UpdateReservationBody,
   CancelReservationParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -43,6 +44,7 @@ async function fetchJoined(filters: {
   status?: string;
   vehicleId?: string;
   id?: string;
+  ownerUserId?: string;
 }) {
   const conds = [];
   if (filters.status)
@@ -50,6 +52,8 @@ async function fetchJoined(filters: {
   if (filters.vehicleId)
     conds.push(eq(reservationsTable.vehicleId, filters.vehicleId));
   if (filters.id) conds.push(eq(reservationsTable.id, filters.id));
+  if (filters.ownerUserId)
+    conds.push(eq(vehiclesTable.userId, filters.ownerUserId));
   const rows = await db
     .select({
       reservation: reservationsTable,
@@ -64,16 +68,18 @@ async function fetchJoined(filters: {
   return rows;
 }
 
-router.get("/reservations", async (req, res) => {
+router.get("/reservations", requireAuth, async (req, res) => {
   const params = ListReservationsQueryParams.parse(req.query);
+  const isOperator = req.auth!.role === "operator";
   const rows = await fetchJoined({
     status: params.status,
     vehicleId: params.vehicleId,
+    ownerUserId: isOperator ? undefined : req.auth!.userId,
   });
   res.json(rows.map(serialize));
 });
 
-router.post("/reservations", async (req, res) => {
+router.post("/reservations", requireAuth, async (req, res) => {
   const body = CreateReservationBody.parse(req.body);
   const [spot] = await db
     .select()
@@ -81,6 +87,22 @@ router.post("/reservations", async (req, res) => {
     .where(eq(spotsTable.id, body.spotId));
   if (!spot) {
     res.status(404).json({ error: "Spot not found" });
+    return;
+  }
+  // Verify the vehicle belongs to the current user (operators can use any).
+  const [vehicle] = await db
+    .select()
+    .from(vehiclesTable)
+    .where(eq(vehiclesTable.id, body.vehicleId));
+  if (!vehicle) {
+    res.status(404).json({ error: "Vehicle not found" });
+    return;
+  }
+  if (
+    req.auth!.role !== "operator" &&
+    vehicle.userId !== req.auth!.userId
+  ) {
+    res.status(403).json({ error: "Vehicle does not belong to you" });
     return;
   }
   const start = new Date(body.startTime);
@@ -122,9 +144,25 @@ router.post("/reservations", async (req, res) => {
   res.status(201).json(serialize(joined!));
 });
 
-router.get("/reservations/:id", async (req, res) => {
+async function findOwnedReservation(
+  id: string,
+  userId: string,
+  isOperator: boolean,
+) {
+  const [row] = await fetchJoined({
+    id,
+    ownerUserId: isOperator ? undefined : userId,
+  });
+  return row;
+}
+
+router.get("/reservations/:id", requireAuth, async (req, res) => {
   const { id } = GetReservationParams.parse(req.params);
-  const [joined] = await fetchJoined({ id });
+  const joined = await findOwnedReservation(
+    id,
+    req.auth!.userId,
+    req.auth!.role === "operator",
+  );
   if (!joined) {
     res.status(404).json({ error: "Reservation not found" });
     return;
@@ -132,9 +170,15 @@ router.get("/reservations/:id", async (req, res) => {
   res.json(serialize(joined));
 });
 
-router.patch("/reservations/:id", async (req, res) => {
+router.patch("/reservations/:id", requireAuth, async (req, res) => {
   const { id } = UpdateReservationParams.parse(req.params);
   const body = UpdateReservationBody.parse(req.body);
+  const isOperator = req.auth!.role === "operator";
+  const owned = await findOwnedReservation(id, req.auth!.userId, isOperator);
+  if (!owned) {
+    res.status(404).json({ error: "Reservation not found" });
+    return;
+  }
   const updates: Partial<typeof reservationsTable.$inferInsert> = {};
   if (body.status) updates.status = body.status;
   if (body.startTime) updates.startTime = new Date(body.startTime);
@@ -183,8 +227,14 @@ router.patch("/reservations/:id", async (req, res) => {
   res.json(serialize(joined!));
 });
 
-router.delete("/reservations/:id", async (req, res) => {
+router.delete("/reservations/:id", requireAuth, async (req, res) => {
   const { id } = CancelReservationParams.parse(req.params);
+  const isOperator = req.auth!.role === "operator";
+  const owned = await findOwnedReservation(id, req.auth!.userId, isOperator);
+  if (!owned) {
+    res.status(404).json({ error: "Reservation not found" });
+    return;
+  }
   const [row] = await db
     .update(reservationsTable)
     .set({ status: "cancelled" })

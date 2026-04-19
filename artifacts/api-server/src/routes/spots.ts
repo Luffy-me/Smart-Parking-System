@@ -9,6 +9,7 @@ import {
   UpdateSpotBody,
   DeleteSpotParams,
 } from "@workspace/api-zod";
+import { requireAuth, requireOperator } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -25,7 +26,7 @@ function serialize(s: typeof spotsTable.$inferSelect) {
   };
 }
 
-router.get("/spots", async (req, res) => {
+router.get("/spots", requireAuth, async (req, res) => {
   const params = ListSpotsQueryParams.parse(req.query);
   const conds = [];
   if (params.zone) conds.push(eq(spotsTable.zone, params.zone));
@@ -38,7 +39,7 @@ router.get("/spots", async (req, res) => {
   res.json(rows.map(serialize));
 });
 
-router.post("/spots", async (req, res) => {
+router.post("/spots", requireAuth, requireOperator, async (req, res) => {
   const body = CreateSpotBody.parse(req.body);
   const [row] = await db
     .insert(spotsTable)
@@ -58,7 +59,7 @@ router.post("/spots", async (req, res) => {
   res.status(201).json(serialize(row));
 });
 
-router.get("/spots/:id", async (req, res) => {
+router.get("/spots/:id", requireAuth, async (req, res) => {
   const { id } = GetSpotParams.parse(req.params);
   const [row] = await db.select().from(spotsTable).where(eq(spotsTable.id, id));
   if (!row) {
@@ -68,7 +69,7 @@ router.get("/spots/:id", async (req, res) => {
   res.json(serialize(row));
 });
 
-router.patch("/spots/:id", async (req, res) => {
+router.patch("/spots/:id", requireAuth, requireOperator, async (req, res) => {
   const { id } = UpdateSpotParams.parse(req.params);
   const body = UpdateSpotBody.parse(req.body);
   const [row] = await db
@@ -83,7 +84,7 @@ router.patch("/spots/:id", async (req, res) => {
   res.json(serialize(row));
 });
 
-router.delete("/spots/:id", async (req, res) => {
+router.delete("/spots/:id", requireAuth, requireOperator, async (req, res) => {
   const { id } = DeleteSpotParams.parse(req.params);
   await db.delete(spotsTable).where(eq(spotsTable.id, id));
   res.status(204).end();

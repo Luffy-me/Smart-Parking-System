@@ -9,6 +9,7 @@ servers:
     description: Base API path
 tags:
   - name: health
+  - name: auth
   - name: spots
   - name: reservations
   - name: vehicles
@@ -27,6 +28,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get the currently signed-in user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CurrentUser" }
+        "401":
+          description: Not signed in
 
   /spots:
     get:
@@ -350,6 +365,18 @@ components:
       required: [status]
       properties:
         status: { type: string }
+
+    UserRole:
+      type: string
+      enum: [driver, operator]
+
+    CurrentUser:
+      type: object
+      required: [id, role]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        role: { $ref: "#/components/schemas/UserRole" }
 
     SpotStatus:
       type: string

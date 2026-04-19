@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, vehiclesTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import {
   CreateVehicleBody,
   GetVehicleParams,
@@ -8,6 +8,7 @@ import {
   UpdateVehicleBody,
   DeleteVehicleParams,
 } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -24,15 +25,20 @@ function serialize(v: typeof vehiclesTable.$inferSelect) {
   };
 }
 
-router.get("/vehicles", async (_req, res) => {
+router.get("/vehicles", requireAuth, async (req, res) => {
+  const where =
+    req.auth!.role === "operator"
+      ? undefined
+      : eq(vehiclesTable.userId, req.auth!.userId);
   const rows = await db
     .select()
     .from(vehiclesTable)
+    .where(where)
     .orderBy(desc(vehiclesTable.createdAt));
   res.json(rows.map(serialize));
 });
 
-router.post("/vehicles", async (req, res) => {
+router.post("/vehicles", requireAuth, async (req, res) => {
   const body = CreateVehicleBody.parse(req.body);
   const [row] = await db
     .insert(vehiclesTable)
@@ -43,6 +49,7 @@ router.post("/vehicles", async (req, res) => {
       color: body.color,
       type: body.type,
       ownerName: body.ownerName ?? null,
+      userId: req.auth!.userId,
     })
     .returning();
   if (!row) {
@@ -52,12 +59,23 @@ router.post("/vehicles", async (req, res) => {
   res.status(201).json(serialize(row));
 });
 
-router.get("/vehicles/:id", async (req, res) => {
-  const { id } = GetVehicleParams.parse(req.params);
+async function findOwnedVehicle(id: string, userId: string, isOperator: boolean) {
+  const conds = [eq(vehiclesTable.id, id)];
+  if (!isOperator) conds.push(eq(vehiclesTable.userId, userId));
   const [row] = await db
     .select()
     .from(vehiclesTable)
-    .where(eq(vehiclesTable.id, id));
+    .where(and(...conds));
+  return row;
+}
+
+router.get("/vehicles/:id", requireAuth, async (req, res) => {
+  const { id } = GetVehicleParams.parse(req.params);
+  const row = await findOwnedVehicle(
+    id,
+    req.auth!.userId,
+    req.auth!.role === "operator",
+  );
   if (!row) {
     res.status(404).json({ error: "Vehicle not found" });
     return;
@@ -65,9 +83,18 @@ router.get("/vehicles/:id", async (req, res) => {
   res.json(serialize(row));
 });
 
-router.patch("/vehicles/:id", async (req, res) => {
+router.patch("/vehicles/:id", requireAuth, async (req, res) => {
   const { id } = UpdateVehicleParams.parse(req.params);
   const body = UpdateVehicleBody.parse(req.body);
+  const owned = await findOwnedVehicle(
+    id,
+    req.auth!.userId,
+    req.auth!.role === "operator",
+  );
+  if (!owned) {
+    res.status(404).json({ error: "Vehicle not found" });
+    return;
+  }
   const [row] = await db
     .update(vehiclesTable)
     .set({
@@ -87,8 +114,17 @@ router.patch("/vehicles/:id", async (req, res) => {
   res.json(serialize(row));
 });
 
-router.delete("/vehicles/:id", async (req, res) => {
+router.delete("/vehicles/:id", requireAuth, async (req, res) => {
   const { id } = DeleteVehicleParams.parse(req.params);
+  const owned = await findOwnedVehicle(
+    id,
+    req.auth!.userId,
+    req.auth!.role === "operator",
+  );
+  if (!owned) {
+    res.status(404).json({ error: "Vehicle not found" });
+    return;
+  }
   await db.delete(vehiclesTable).where(eq(vehiclesTable.id, id));
   res.status(204).end();
 });

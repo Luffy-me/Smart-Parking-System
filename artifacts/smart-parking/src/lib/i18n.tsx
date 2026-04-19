@@ -6,6 +6,7 @@ const DICT = {
   en: {
     appName: "Parq",
     operator: "Operator",
+    driver: "Driver",
     admin: "Admin",
     nav: {
       dashboard: "Dashboard",
@@ -55,11 +56,13 @@ const DICT = {
       theme: "Theme",
       darkMode: "Dark mode",
       lightMode: "Light mode",
+      signOut: "Sign out",
     },
   },
   ru: {
     appName: "Парк",
     operator: "Оператор",
+    driver: "Водитель",
     admin: "Администратор",
     nav: {
       dashboard: "Панель",
@@ -109,6 +112,7 @@ const DICT = {
       theme: "Тема",
       darkMode: "Тёмная тема",
       lightMode: "Светлая тема",
+      signOut: "Выйти",
     },
   },
 } as const;

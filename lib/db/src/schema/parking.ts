@@ -7,6 +7,15 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+export const usersTable = pgTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email"),
+  role: text("role").notNull().default("driver"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const spotsTable = pgTable("spots", {
   id: uuid("id").primaryKey().defaultRandom(),
   code: text("code").notNull().unique(),
@@ -28,6 +37,9 @@ export const vehiclesTable = pgTable("vehicles", {
   color: text("color").notNull(),
   type: text("type").notNull(),
   ownerName: text("owner_name"),
+  userId: text("user_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -61,6 +73,7 @@ export const transactionsTable = pgTable("transactions", {
   paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export type User = typeof usersTable.$inferSelect;
 export type Spot = typeof spotsTable.$inferSelect;
 export type Vehicle = typeof vehiclesTable.$inferSelect;
 export type Reservation = typeof reservationsTable.$inferSelect;

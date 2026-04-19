@@ -7,8 +7,11 @@ import {
   transactionsTable,
 } from "@workspace/db";
 import { sql, gte, desc, eq } from "drizzle-orm";
+import { requireAuth, requireOperator } from "../middlewares/auth";
 
 const router: IRouter = Router();
+
+router.use(requireAuth, requireOperator);
 
 router.get("/dashboard/summary", async (_req, res) => {
   const spots = await db.select().from(spotsTable);

@@ -9,6 +9,19 @@ export interface HealthStatus {
   status: string;
 }
 
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
+export const UserRole = {
+  driver: "driver",
+  operator: "operator",
+} as const;
+
+export interface CurrentUser {
+  id: string;
+  email?: string;
+  role: UserRole;
+}
+
 export type SpotStatus = (typeof SpotStatus)[keyof typeof SpotStatus];
 
 export const SpotStatus = {

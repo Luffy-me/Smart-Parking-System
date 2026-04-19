@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useClerk } from "@clerk/react";
 import {
   LayoutDashboard,
   Map,
@@ -12,30 +13,62 @@ import {
   Languages,
   Sun,
   Moon,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import type { CurrentUser } from "@workspace/api-client-react";
 
-const NAV_ITEMS: { href: string; labelKey: TranslationKey; icon: typeof LayoutDashboard }[] = [
-  { href: "/", labelKey: "nav.dashboard", icon: LayoutDashboard },
+type NavItem = {
+  href: string;
+  labelKey: TranslationKey;
+  icon: typeof LayoutDashboard;
+  operatorOnly?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { href: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard, operatorOnly: true },
   { href: "/map", labelKey: "nav.map", icon: Map },
   { href: "/reservations", labelKey: "nav.reservations", icon: CalendarRange },
   { href: "/vehicles", labelKey: "nav.vehicles", icon: CarFront },
   { href: "/transactions", labelKey: "nav.transactions", icon: Receipt },
-  { href: "/spots", labelKey: "nav.spots", icon: Settings2 },
+  { href: "/spots", labelKey: "nav.spots", icon: Settings2, operatorOnly: true },
 ];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function initialsOf(user: CurrentUser): string {
+  if (user.email) {
+    const local = user.email.split("@")[0];
+    return local.slice(0, 2).toUpperCase();
+  }
+  return user.role === "operator" ? "OP" : "DR";
+}
+
+export function AppShell({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: CurrentUser;
+}) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t, lang, toggleLang } = useI18n();
   const { theme, toggleTheme } = useTheme();
+  const { signOut } = useClerk();
+
+  const visibleNav = NAV_ITEMS.filter(
+    (item) => !item.operatorOnly || user.role === "operator",
+  );
+
+  const handleSignOut = () => {
+    void signOut({ redirectUrl: import.meta.env.BASE_URL });
+  };
 
   const NavLinks = () => (
     <>
-      {NAV_ITEMS.map((item) => {
+      {visibleNav.map((item) => {
         const isActive = location === item.href;
         return (
           <Link
@@ -86,6 +119,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 
+  const userBlock = (
+    <div className="flex items-center gap-3 px-3 py-2 w-full">
+      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center border">
+        <span className="text-sm font-medium">{initialsOf(user)}</span>
+      </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="text-sm font-medium truncate">
+          {user.email ??
+            (user.role === "operator" ? t("operator") : t("driver"))}
+        </span>
+        <span className="text-xs text-muted-foreground capitalize">
+          {user.role === "operator" ? t("operator") : t("driver")}
+        </span>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleSignOut}
+        title={t("common.signOut")}
+        aria-label={t("common.signOut")}
+      >
+        <LogOut className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Mobile Header */}
@@ -104,16 +163,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-4">
+            <SheetContent side="left" className="w-64 p-4 flex flex-col">
               <div className="flex items-center gap-2 mb-8 mt-4">
                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                   <Map className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <span className="font-bold text-xl">{t("appName")}</span>
               </div>
-              <nav className="flex flex-col gap-1">
+              <nav className="flex flex-col gap-1 flex-1">
                 <NavLinks />
               </nav>
+              <div className="border-t pt-2 mt-auto">{userBlock}</div>
             </SheetContent>
           </Sheet>
         </div>
@@ -130,17 +190,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 px-4 py-4 flex flex-col gap-1 overflow-y-auto">
           <NavLinks />
         </nav>
-        <div className="p-4 border-t mt-auto">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center border">
-              <span className="text-sm font-medium">OP</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{t("operator")}</span>
-              <span className="text-xs text-muted-foreground">{t("admin")}</span>
-            </div>
-          </div>
-        </div>
+        <div className="p-4 border-t mt-auto">{userBlock}</div>
       </aside>
 
       {/* Main Content */}

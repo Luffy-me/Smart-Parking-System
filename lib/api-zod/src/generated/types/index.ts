@@ -8,6 +8,7 @@
 
 export * from "./activityItem";
 export * from "./activityItemKind";
+export * from "./currentUser";
 export * from "./dashboardSummary";
 export * from "./healthStatus";
 export * from "./listReservationsParams";
@@ -25,6 +26,7 @@ export * from "./spotType";
 export * from "./spotUpdate";
 export * from "./transaction";
 export * from "./transactionStatus";
+export * from "./userRole";
 export * from "./vehicle";
 export * from "./vehicleInput";
 export * from "./zoneStat";

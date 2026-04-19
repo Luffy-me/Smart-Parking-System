@@ -8,14 +8,17 @@ import {
 } from "@workspace/db";
 import { eq, desc, and } from "drizzle-orm";
 import { ListTransactionsQueryParams } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
-router.get("/transactions", async (req, res) => {
+router.get("/transactions", requireAuth, async (req, res) => {
   const params = ListTransactionsQueryParams.parse(req.query);
   const conds = [];
   if (params.vehicleId)
     conds.push(eq(reservationsTable.vehicleId, params.vehicleId));
+  if (req.auth!.role !== "operator")
+    conds.push(eq(vehiclesTable.userId, req.auth!.userId));
 
   const rows = await db
     .select({

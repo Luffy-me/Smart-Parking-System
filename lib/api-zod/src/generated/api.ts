@@ -15,6 +15,15 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
+ * @summary Get the currently signed-in user
+ */
+export const GetCurrentUserResponse = zod.object({
+  id: zod.string(),
+  email: zod.string().optional(),
+  role: zod.enum(["driver", "operator"]),
+});
+
+/**
  * @summary List all parking spots
  */
 export const ListSpotsQueryParams = zod.object({
