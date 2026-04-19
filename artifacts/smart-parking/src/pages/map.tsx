@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Car, Clock, Zap, Settings, ShieldCheck, Accessibility, Bike, CalendarRange, DollarSign } from "lucide-react";
+import { MapPin, Car, Clock, Zap, Settings, ShieldCheck, Accessibility, Bike, CalendarRange, DollarSign, GraduationCap } from "lucide-react";
 import type { Spot } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -93,7 +93,15 @@ export default function LiveMap() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("pages.mapTitle")}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-3xl font-bold tracking-tight">{t("pages.mapTitle")}</h1>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-[11px] font-semibold uppercase tracking-wider">
+              <MapPin className="h-3 w-3" /> {t("marketing.cityName")}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground text-[11px] font-medium">
+              <GraduationCap className="h-3 w-3" /> {t("marketing.susuShort")}
+            </span>
+          </div>
           <p className="text-muted-foreground mt-1">{t("pages.mapSubtitle")}</p>
         </div>
         

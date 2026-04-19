@@ -29,6 +29,9 @@ import { I18nProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/lib/theme";
 
 import Landing from "@/pages/landing";
+import About from "@/pages/about";
+import Contact from "@/pages/contact";
+import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import Dashboard from "@/pages/dashboard";
 import LiveMap from "@/pages/map";
 import Reservations from "@/pages/reservations";
@@ -190,9 +193,37 @@ function HomeRedirect() {
         <SignedInHome />
       </Show>
       <Show when="signed-out">
-        <Landing />
+        <MarketingLayout>
+          <Landing />
+        </MarketingLayout>
       </Show>
     </>
+  );
+}
+
+function PublicAboutPage() {
+  return (
+    <MarketingLayout>
+      <About />
+    </MarketingLayout>
+  );
+}
+
+function PublicContactPage() {
+  return (
+    <MarketingLayout>
+      <Contact />
+    </MarketingLayout>
+  );
+}
+
+function PublicPricingPage() {
+  return (
+    <MarketingLayout>
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <Pricing />
+      </div>
+    </MarketingLayout>
   );
 }
 
@@ -267,6 +298,8 @@ function AppRoutes() {
   return (
     <Switch>
       <Route path="/" component={HomeRedirect} />
+      <Route path="/about" component={PublicAboutPage} />
+      <Route path="/contact" component={PublicContactPage} />
       <Route path="/sign-in/*?" component={SignInPage} />
       <Route path="/sign-up/*?" component={SignUpPage} />
       <Route>
@@ -274,7 +307,12 @@ function AppRoutes() {
           <ProtectedRoutes />
         </Show>
         <Show when="signed-out">
-          <Redirect to="/" />
+          <Switch>
+            <Route path="/pricing" component={PublicPricingPage} />
+            <Route>
+              <Redirect to="/" />
+            </Route>
+          </Switch>
         </Show>
       </Route>
     </Switch>

@@ -18,6 +18,8 @@ import {
   BarChart3,
   Tag,
   Settings,
+  MapPin,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -161,6 +163,9 @@ export function AppShell({
         <div className="flex items-center gap-2">
           <Logo className="h-8 w-8" />
           <span className="font-bold text-lg tracking-tight">{t("appName")}</span>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] font-medium uppercase tracking-wider">
+            <MapPin className="h-2.5 w-2.5" /> {t("marketing.cityName")}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <HeaderActions />
@@ -196,12 +201,24 @@ export function AppShell({
         <nav className="flex-1 px-4 py-4 flex flex-col gap-1 overflow-y-auto">
           <NavLinks />
         </nav>
-        <div className="p-4 border-t mt-auto">{userBlock}</div>
+        <div className="px-4 pt-3 border-t mt-auto">
+          <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground px-2 mb-2">
+            <GraduationCap className="h-3 w-3 text-primary" />
+            <span>{t("marketing.susuShort")}</span>
+            <span className="opacity-50">·</span>
+            <MapPin className="h-3 w-3" />
+            <span>{t("marketing.cityName")}</span>
+          </div>
+          {userBlock}
+        </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        <header className="hidden md:flex h-16 items-center justify-end px-8 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 gap-2">
+        <header className="hidden md:flex h-16 items-center justify-between px-8 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10 gap-2">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-[11px] font-medium uppercase tracking-wider">
+            <MapPin className="h-3 w-3" /> {t("marketing.cityLive")}
+          </span>
           <HeaderActions />
         </header>
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
