@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { useListTransactions } from "@workspace/api-client-react";
 import type { TransactionStatus } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,6 +19,7 @@ const STATUS_COLORS: Record<TransactionStatus, string> = {
 };
 
 export default function Transactions() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | "all">("all");
 
@@ -35,8 +37,8 @@ export default function Transactions() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-          <p className="text-muted-foreground mt-1">Review parking payments and revenue history.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.transactionsTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.transactionsSubtitle")}</p>
         </div>
       </div>
 

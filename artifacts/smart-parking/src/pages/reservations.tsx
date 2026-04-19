@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useI18n } from "@/lib/i18n";
 import { 
   useListReservations, 
   useCreateReservation, 
@@ -33,6 +34,7 @@ const STATUS_COLORS: Record<ReservationStatus, string> = {
 };
 
 export default function Reservations() {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<ReservationStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
@@ -62,8 +64,8 @@ export default function Reservations() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
-          <p className="text-muted-foreground mt-1">Manage parking bookings and schedules.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.reservationsTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.reservationsSubtitle")}</p>
         </div>
         <Dialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen}>
           <DialogTrigger asChild>

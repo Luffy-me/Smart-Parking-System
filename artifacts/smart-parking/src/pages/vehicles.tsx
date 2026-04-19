@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { 
   useListVehicles, 
   useCreateVehicle, 
@@ -24,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
 export default function Vehicles() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
@@ -56,8 +58,8 @@ export default function Vehicles() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Vehicles</h1>
-          <p className="text-muted-foreground mt-1">Manage registered vehicles and their history.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.vehiclesTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.vehiclesSubtitle")}</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>

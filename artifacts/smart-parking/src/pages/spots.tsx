@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { 
   useListSpots, 
   useCreateSpot, 
@@ -28,6 +29,7 @@ const STATUS_COLORS: Record<SpotStatus, string> = {
 };
 
 export default function SpotsAdmin() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingSpotId, setEditingSpotId] = useState<string | null>(null);
@@ -57,8 +59,8 @@ export default function SpotsAdmin() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Spots Admin</h1>
-          <p className="text-muted-foreground mt-1">Manage parking spots inventory and settings.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.spotsTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.spotsSubtitle")}</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>

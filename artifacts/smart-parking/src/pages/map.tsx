@@ -26,8 +26,8 @@ import type { Spot } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format, addHours } from "date-fns";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { YandexMap } from "@/components/YandexMap";
+import { useI18n } from "@/lib/i18n";
 
 const STATUS_COLORS: Record<SpotStatus, string> = {
   available: "bg-primary border-primary text-primary-foreground",
@@ -48,7 +48,7 @@ export default function LiveMap() {
   const [selectedZone, setSelectedZone] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<SpotStatus | "all">("all");
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
-  const [view, setView] = useState<"map" | "grid">("map");
+  const { t } = useI18n();
 
   const { data: spots, isLoading } = useListSpots();
   const updateSpot = useUpdateSpot();
@@ -92,17 +92,11 @@ export default function LiveMap() {
     <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Live Map</h1>
-          <p className="text-muted-foreground mt-1">Real-time occupancy and spot management.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.mapTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.mapSubtitle")}</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
-          <Tabs value={view} onValueChange={(v) => setView(v as "map" | "grid")}>
-            <TabsList className="h-9">
-              <TabsTrigger value="map" className="text-xs">Street Map</TabsTrigger>
-              <TabsTrigger value="grid" className="text-xs">Grid</TabsTrigger>
-            </TabsList>
-          </Tabs>
           <div className="flex items-center gap-3 bg-card p-2 rounded-lg border shadow-sm">
           <Select value={selectedZone} onValueChange={setSelectedZone}>
             <SelectTrigger className="w-[120px] h-8 text-xs border-0 bg-transparent shadow-none focus:ring-0">
@@ -142,56 +136,12 @@ export default function LiveMap() {
               <p className="text-muted-foreground">Loading map...</p>
             </div>
           </div>
-        ) : view === "map" ? (
+        ) : (
           <YandexMap
             spots={filteredSpots}
             selectedSpotId={selectedSpotId}
             onSelect={setSelectedSpotId}
           />
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 auto-rows-max overflow-y-auto pr-2 pb-4 p-6">
-            <AnimatePresence>
-              {filteredSpots.map((spot, index) => {
-                const Icon = TYPE_ICONS[spot.type] || Car;
-                const isSelected = selectedSpotId === spot.id;
-                
-                return (
-                  <motion.button
-                    key={spot.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ delay: Math.min(index * 0.01, 0.5) }}
-                    onClick={() => setSelectedSpotId(spot.id)}
-                    className={`
-                      relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all
-                      ${STATUS_COLORS[spot.status]} 
-                      ${isSelected ? 'ring-2 ring-ring ring-offset-2 ring-offset-background scale-105 z-10 shadow-lg' : 'hover:scale-105 hover:shadow-md'}
-                    `}
-                  >
-                    <span className="text-xs font-bold mb-1 opacity-90">{spot.code}</span>
-                    <Icon className="h-6 w-6 mb-1" />
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">{spot.zone}</span>
-                      <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">L{spot.level}</span>
-                    </div>
-                    {spot.type !== "standard" && (
-                      <Badge variant="outline" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-background text-foreground border-border text-[8px]">
-                        {spot.type === 'ev' ? 'EV' : spot.type === 'accessible' ? '♿' : spot.type === 'motorcycle' ? 'M' : 'C'}
-                      </Badge>
-                    )}
-                  </motion.button>
-                )
-              })}
-            </AnimatePresence>
-            {filteredSpots.length === 0 && (
-              <div className="col-span-full flex flex-col items-center justify-center py-12 text-muted-foreground">
-                <MapPin className="h-12 w-12 mb-4 opacity-20" />
-                <p>No spots match your filters.</p>
-              </div>
-            )}
-          </div>
         )}
       </div>
 

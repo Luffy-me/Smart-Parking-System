@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Car, Map, CalendarRange, DollarSign, Activity, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/lib/i18n";
 
 export default function Dashboard() {
+  const { t } = useI18n();
   const { data: summary, isLoading: isLoadingSummary } = useGetDashboardSummary();
   const { data: trend, isLoading: isLoadingTrend } = useGetRevenueTrend();
   const { data: zones, isLoading: isLoadingZones } = useGetZoneBreakdown();
@@ -29,8 +31,8 @@ export default function Dashboard() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Live parking operations overview.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pages.dashboardTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("pages.dashboardSubtitle")}</p>
         </div>
       </div>
 
@@ -50,7 +52,7 @@ export default function Dashboard() {
           <motion.div variants={item}>
             <Card className="hover-elevate">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue Today</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("metrics.revenueToday")}</CardTitle>
                 <DollarSign className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
@@ -64,7 +66,7 @@ export default function Dashboard() {
           <motion.div variants={item}>
             <Card className="hover-elevate">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Spot Utilization</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("metrics.utilization")}</CardTitle>
                 <Map className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
@@ -78,7 +80,7 @@ export default function Dashboard() {
           <motion.div variants={item}>
             <Card className="hover-elevate">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Reservations</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("metrics.activeReservations")}</CardTitle>
                 <CalendarRange className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
@@ -92,7 +94,7 @@ export default function Dashboard() {
           <motion.div variants={item}>
             <Card className="hover-elevate">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Registered Vehicles</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("metrics.registeredVehicles")}</CardTitle>
                 <Car className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
@@ -109,7 +111,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Revenue Trend (Last 7 Days)</CardTitle>
+            <CardTitle>{t("metrics.revenueTrend")}</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
             {isLoadingTrend ? (
@@ -160,7 +162,7 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>{t("metrics.recentActivity")}</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px] overflow-y-auto pr-2">
             {isLoadingActivity ? (
