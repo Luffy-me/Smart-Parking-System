@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { 
   useListReservations, 
   useCreateReservation, 
@@ -183,7 +183,14 @@ function NewReservationForm({ onSuccess }: { onSuccess: () => void }) {
   const [step, setStep] = useState(1);
   const [vehicleId, setVehicleId] = useState("");
   const [spotId, setSpotId] = useState("");
-  const [durationHours, setDurationHours] = useState(2);
+  const defaultStart = useMemo(() => {
+    const d = new Date();
+    d.setMinutes(0, 0, 0);
+    d.setHours(d.getHours() + 1);
+    return d;
+  }, []);
+  const [startTime, setStartTime] = useState<string>(format(defaultStart, "yyyy-MM-dd'T'HH:mm"));
+  const [endTime, setEndTime] = useState<string>(format(addHours(defaultStart, 2), "yyyy-MM-dd'T'HH:mm"));
 
   const { data: vehicles } = useListVehicles();
   const { data: spots } = useListSpots({ status: "available" });
@@ -193,19 +200,27 @@ function NewReservationForm({ onSuccess }: { onSuccess: () => void }) {
   const selectedVehicle = vehicles?.find(v => v.id === vehicleId);
   const selectedSpot = spots?.find(s => s.id === spotId);
 
+  const durationHours = useMemo(() => {
+    const start = new Date(startTime).getTime();
+    const end = new Date(endTime).getTime();
+    if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 0;
+    return Math.round(((end - start) / 3_600_000) * 10) / 10;
+  }, [startTime, endTime]);
+
   const handleNext = () => setStep(s => s + 1);
   const handleBack = () => setStep(s => s - 1);
 
   const handleSubmit = () => {
-    const startTime = new Date().toISOString();
-    const endTime = addHours(new Date(), durationHours).toISOString();
-
+    if (durationHours <= 0) {
+      toast.error("End time must be after start time");
+      return;
+    }
     createReservation.mutate({
       data: {
         spotId,
         vehicleId,
-        startTime,
-        endTime
+        startTime: new Date(startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
       }
     }, {
       onSuccess: () => {
@@ -281,17 +296,27 @@ function NewReservationForm({ onSuccess }: { onSuccess: () => void }) {
         )}
 
         {step === 3 && (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-            <div className="space-y-2">
-              <Label>Duration (Hours)</Label>
-              <Input 
-                type="number" 
-                min={1} max={24} 
-                value={durationHours} 
-                onChange={e => setDurationHours(Number(e.target.value))} 
-              />
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Start</Label>
+                <Input
+                  type="datetime-local"
+                  value={startTime}
+                  onChange={e => setStartTime(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>End</Label>
+                <Input
+                  type="datetime-local"
+                  value={endTime}
+                  min={startTime}
+                  onChange={e => setEndTime(e.target.value)}
+                />
+              </div>
             </div>
-            
+
             <div className="bg-muted/30 p-4 rounded-xl border space-y-3">
               <h4 className="font-semibold text-sm">Summary</h4>
               <div className="flex justify-between text-sm">
@@ -304,11 +329,11 @@ function NewReservationForm({ onSuccess }: { onSuccess: () => void }) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Duration</span>
-                <span className="font-medium">{durationHours} hours</span>
+                <span className="font-medium">{durationHours > 0 ? `${durationHours} hours` : "Invalid range"}</span>
               </div>
               <div className="border-t pt-2 mt-2 flex justify-between">
                 <span className="font-semibold">Total Cost</span>
-                <span className="font-bold text-primary">${((selectedSpot?.hourlyRate || 0) * durationHours).toFixed(2)}</span>
+                <span className="font-bold text-primary">${((selectedSpot?.hourlyRate || 0) * Math.max(durationHours, 0)).toFixed(2)}</span>
               </div>
             </div>
           </motion.div>

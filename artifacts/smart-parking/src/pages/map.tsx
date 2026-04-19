@@ -202,19 +202,34 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStat
   const queryClient = useQueryClient();
 
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
-  const [durationHours, setDurationHours] = useState<number>(2);
+  const defaultStart = useMemo(() => {
+    const d = new Date();
+    d.setMinutes(0, 0, 0);
+    d.setHours(d.getHours() + 1);
+    return d;
+  }, []);
+  const [startTime, setStartTime] = useState<string>(format(defaultStart, "yyyy-MM-dd'T'HH:mm"));
+  const [endTime, setEndTime] = useState<string>(format(addHours(defaultStart, 2), "yyyy-MM-dd'T'HH:mm"));
+
+  const durationHours = useMemo(() => {
+    const start = new Date(startTime).getTime();
+    const end = new Date(endTime).getTime();
+    if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 0;
+    return Math.round(((end - start) / 3_600_000) * 10) / 10;
+  }, [startTime, endTime]);
 
   const handleCreateReservation = () => {
     if (!selectedVehicleId) {
       toast.error("Please select a vehicle");
       return;
     }
-
-    const startTime = new Date().toISOString();
-    const endTime = addHours(new Date(), durationHours).toISOString();
+    if (durationHours <= 0) {
+      toast.error("End time must be after start time");
+      return;
+    }
 
     createReservation.mutate(
-      { data: { spotId: spot.id, vehicleId: selectedVehicleId, startTime, endTime } },
+      { data: { spotId: spot.id, vehicleId: selectedVehicleId, startTime: new Date(startTime).toISOString(), endTime: new Date(endTime).toISOString() } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListSpotsQueryKey() });
@@ -333,20 +348,29 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStat
                     </Select>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label>Duration (Hours)</Label>
-                    <Input 
-                      type="number" 
-                      min={1} 
-                      max={24} 
-                      value={durationHours} 
-                      onChange={(e) => setDurationHours(Number(e.target.value))} 
-                    />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <Label>Start</Label>
+                      <Input
+                        type="datetime-local"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End</Label>
+                      <Input
+                        type="datetime-local"
+                        value={endTime}
+                        min={startTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm py-2 border-t mt-4">
-                    <span className="text-muted-foreground">Estimated Cost</span>
-                    <span className="font-bold text-lg">${(spot.hourlyRate * durationHours).toFixed(2)}</span>
+                    <span className="text-muted-foreground">{durationHours > 0 ? `${durationHours}h estimated cost` : "Invalid range"}</span>
+                    <span className="font-bold text-lg">${(spot.hourlyRate * Math.max(durationHours, 0)).toFixed(2)}</span>
                   </div>
 
                   <div className="flex gap-2">
