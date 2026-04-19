@@ -30,3 +30,8 @@ externalPort = 80
 [[ports]]
 localPort = 21091
 externalPort = 3000
+
+[userenv]
+
+[userenv.shared]
+VITE_YANDEX_MAPS_API_KEY = "3b233cbe-f2e2-46f0-8f6a-a0a11b465b81"

@@ -26,6 +26,8 @@ import type { Spot } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format, addHours } from "date-fns";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { YandexMap } from "@/components/YandexMap";
 
 const STATUS_COLORS: Record<SpotStatus, string> = {
   available: "bg-primary border-primary text-primary-foreground",
@@ -46,6 +48,7 @@ export default function LiveMap() {
   const [selectedZone, setSelectedZone] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<SpotStatus | "all">("all");
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
+  const [view, setView] = useState<"map" | "grid">("map");
 
   const { data: spots, isLoading } = useListSpots();
   const updateSpot = useUpdateSpot();
@@ -93,7 +96,14 @@ export default function LiveMap() {
           <p className="text-muted-foreground mt-1">Real-time occupancy and spot management.</p>
         </div>
         
-        <div className="flex items-center gap-3 bg-card p-2 rounded-lg border shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+          <Tabs value={view} onValueChange={(v) => setView(v as "map" | "grid")}>
+            <TabsList className="h-9">
+              <TabsTrigger value="map" className="text-xs">Street Map</TabsTrigger>
+              <TabsTrigger value="grid" className="text-xs">Grid</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="flex items-center gap-3 bg-card p-2 rounded-lg border shadow-sm">
           <Select value={selectedZone} onValueChange={setSelectedZone}>
             <SelectTrigger className="w-[120px] h-8 text-xs border-0 bg-transparent shadow-none focus:ring-0">
               <SelectValue placeholder="Zone" />
@@ -120,19 +130,26 @@ export default function LiveMap() {
               <SelectItem value="maintenance">Maintenance</SelectItem>
             </SelectContent>
           </Select>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 bg-muted/30 rounded-xl border overflow-hidden relative p-6 flex flex-col">
+      <div className="flex-1 bg-muted/30 rounded-xl border overflow-hidden relative flex flex-col">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-pulse flex flex-col items-center gap-4">
               <MapPin className="h-12 w-12 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground">Loading grid...</p>
+              <p className="text-muted-foreground">Loading map...</p>
             </div>
           </div>
+        ) : view === "map" ? (
+          <YandexMap
+            spots={filteredSpots}
+            selectedSpotId={selectedSpotId}
+            onSelect={setSelectedSpotId}
+          />
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 auto-rows-max overflow-y-auto pr-2 pb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 auto-rows-max overflow-y-auto pr-2 pb-4 p-6">
             <AnimatePresence>
               {filteredSpots.map((spot, index) => {
                 const Icon = TYPE_ICONS[spot.type] || Car;
