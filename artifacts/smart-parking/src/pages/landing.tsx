@@ -15,14 +15,6 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
-const PARTNERS = [
-  "ЮУрГУ · SUSU",
-  "Chelyabinsk Smart City",
-  "Yandex Maps",
-  "Mosgortrans",
-  "ChelEnergo",
-  "Ural Mobility Lab",
-];
 
 const HERO_IMG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1400&q=80";
 
@@ -225,7 +217,14 @@ export default function Landing() {
             {t("hero.partners")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
-            {PARTNERS.map((p) => (
+            {[
+              `${t("marketing.susuShort")} · SUSU`,
+              t("marketing.partnerSmartCity"),
+              "Yandex Maps",
+              "Mosgortrans",
+              "ChelEnergo",
+              t("marketing.partnerMobilityLab"),
+            ].map((p) => (
               <div
                 key={p}
                 className="text-center font-semibold text-muted-foreground/80 tracking-wide text-xs sm:text-sm"

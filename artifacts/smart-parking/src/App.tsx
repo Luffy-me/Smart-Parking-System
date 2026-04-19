@@ -22,6 +22,7 @@ import {
   useGetCurrentUser,
   type CurrentUser,
 } from "@workspace/api-client-react";
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
@@ -349,8 +350,10 @@ function ClerkProviderWithRoutes() {
         <ThemeProvider>
           <I18nProvider>
             <TooltipProvider>
-              <AppRoutes />
-              <Toaster />
+              <MotionConfig reducedMotion="user">
+                <AppRoutes />
+                <Toaster />
+              </MotionConfig>
             </TooltipProvider>
           </I18nProvider>
         </ThemeProvider>

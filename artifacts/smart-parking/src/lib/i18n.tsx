@@ -192,6 +192,8 @@ const DICT = {
       featureLive: "Live",
       featureEv: "EV",
       featureInsights: "Insights",
+      partnerSmartCity: "Chelyabinsk Smart City",
+      partnerMobilityLab: "Ural Mobility Lab",
     },
     footer: {
       blurb: "A research-driven smart parking platform for Chelyabinsk, developed under South Ural State University. Designed for operators, drivers and city planners.",
@@ -492,6 +494,8 @@ const DICT = {
       featureLive: "Онлайн",
       featureEv: "EV",
       featureInsights: "Инсайты",
+      partnerSmartCity: "Челябинск · Умный город",
+      partnerMobilityLab: "Уральская лаборатория мобильности",
     },
     footer: {
       blurb: "Исследовательская платформа умной парковки для Челябинска, разработанная при ЮУрГУ. Для операторов, водителей и городских планировщиков.",
