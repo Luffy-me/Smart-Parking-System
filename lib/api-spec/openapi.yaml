@@ -3,20 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Smart Parking System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: spots
+  - name: reservations
+  - name: vehicles
+  - name: transactions
+  - name: dashboard
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +27,498 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /spots:
+    get:
+      operationId: listSpots
+      tags: [spots]
+      summary: List all parking spots
+      parameters:
+        - name: zone
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/SpotStatus" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Spot" }
+    post:
+      operationId: createSpot
+      tags: [spots]
+      summary: Create a parking spot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SpotInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Spot" }
+
+  /spots/{id}:
+    get:
+      operationId: getSpot
+      tags: [spots]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Spot" }
+    patch:
+      operationId: updateSpot
+      tags: [spots]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SpotUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Spot" }
+    delete:
+      operationId: deleteSpot
+      tags: [spots]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Deleted
+
+  /reservations:
+    get:
+      operationId: listReservations
+      tags: [reservations]
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: "#/components/schemas/ReservationStatus" }
+        - name: vehicleId
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Reservation" }
+    post:
+      operationId: createReservation
+      tags: [reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReservationInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reservation" }
+
+  /reservations/{id}:
+    get:
+      operationId: getReservation
+      tags: [reservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reservation" }
+    patch:
+      operationId: updateReservation
+      tags: [reservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReservationUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reservation" }
+    delete:
+      operationId: cancelReservation
+      tags: [reservations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Cancelled
+
+  /vehicles:
+    get:
+      operationId: listVehicles
+      tags: [vehicles]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Vehicle" }
+    post:
+      operationId: createVehicle
+      tags: [vehicles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VehicleInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vehicle" }
+
+  /vehicles/{id}:
+    get:
+      operationId: getVehicle
+      tags: [vehicles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vehicle" }
+    patch:
+      operationId: updateVehicle
+      tags: [vehicles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VehicleInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vehicle" }
+    delete:
+      operationId: deleteVehicle
+      tags: [vehicles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Deleted
+
+  /transactions:
+    get:
+      operationId: listTransactions
+      tags: [transactions]
+      parameters:
+        - name: vehicleId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 200 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Transaction" }
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Aggregated stats for the dashboard
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardSummary" }
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Recent parking activity feed
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActivityItem" }
+
+  /dashboard/zones:
+    get:
+      operationId: getZoneBreakdown
+      tags: [dashboard]
+      summary: Per-zone occupancy breakdown
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ZoneStat" }
+
+  /dashboard/revenue:
+    get:
+      operationId: getRevenueTrend
+      tags: [dashboard]
+      summary: Revenue trend by day for the last 7 days
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RevenuePoint" }
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
+        status: { type: string }
+
+    SpotStatus:
+      type: string
+      enum: [available, occupied, reserved, maintenance]
+
+    SpotType:
+      type: string
+      enum: [standard, compact, accessible, ev, motorcycle]
+
+    Spot:
+      type: object
+      required: [id, code, zone, level, type, status, hourlyRate, createdAt]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        zone: { type: string }
+        level: { type: integer }
+        type: { $ref: "#/components/schemas/SpotType" }
+        status: { $ref: "#/components/schemas/SpotStatus" }
+        hourlyRate: { type: number }
+        createdAt: { type: string, format: date-time }
+
+    SpotInput:
+      type: object
+      required: [code, zone, level, type, hourlyRate]
+      properties:
+        code: { type: string }
+        zone: { type: string }
+        level: { type: integer }
+        type: { $ref: "#/components/schemas/SpotType" }
+        hourlyRate: { type: number }
+        status: { $ref: "#/components/schemas/SpotStatus" }
+
+    SpotUpdate:
+      type: object
+      properties:
+        code: { type: string }
+        zone: { type: string }
+        level: { type: integer }
+        type: { $ref: "#/components/schemas/SpotType" }
+        hourlyRate: { type: number }
+        status: { $ref: "#/components/schemas/SpotStatus" }
+
+    ReservationStatus:
+      type: string
+      enum: [upcoming, active, completed, cancelled]
+
+    Reservation:
+      type: object
+      required: [id, spotId, spotCode, vehicleId, vehiclePlate, startTime, endTime, status, totalCost, createdAt]
+      properties:
+        id: { type: string }
+        spotId: { type: string }
+        spotCode: { type: string }
+        vehicleId: { type: string }
+        vehiclePlate: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        status: { $ref: "#/components/schemas/ReservationStatus" }
+        totalCost: { type: number }
+        createdAt: { type: string, format: date-time }
+
+    ReservationInput:
+      type: object
+      required: [spotId, vehicleId, startTime, endTime]
+      properties:
+        spotId: { type: string }
+        vehicleId: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+
+    ReservationUpdate:
+      type: object
+      properties:
+        status: { $ref: "#/components/schemas/ReservationStatus" }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+
+    Vehicle:
+      type: object
+      required: [id, plate, make, model, color, type, createdAt]
+      properties:
+        id: { type: string }
+        plate: { type: string }
+        make: { type: string }
+        model: { type: string }
+        color: { type: string }
+        type: { $ref: "#/components/schemas/SpotType" }
+        ownerName: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    VehicleInput:
+      type: object
+      required: [plate, make, model, color, type]
+      properties:
+        plate: { type: string }
+        make: { type: string }
+        model: { type: string }
+        color: { type: string }
+        type: { $ref: "#/components/schemas/SpotType" }
+        ownerName: { type: string }
+
+    Transaction:
+      type: object
+      required: [id, reservationId, spotCode, vehiclePlate, durationMinutes, amount, paidAt, status]
+      properties:
+        id: { type: string }
+        reservationId: { type: string }
+        spotCode: { type: string }
+        vehiclePlate: { type: string }
+        durationMinutes: { type: integer }
+        amount: { type: number }
+        paidAt: { type: string, format: date-time }
         status:
           type: string
-      required:
-        - status
+          enum: [paid, pending, refunded]
 
+    DashboardSummary:
+      type: object
+      required:
+        - totalSpots
+        - availableSpots
+        - occupiedSpots
+        - reservedSpots
+        - maintenanceSpots
+        - utilizationRate
+        - revenueToday
+        - revenueWeek
+        - activeReservations
+        - totalVehicles
+      properties:
+        totalSpots: { type: integer }
+        availableSpots: { type: integer }
+        occupiedSpots: { type: integer }
+        reservedSpots: { type: integer }
+        maintenanceSpots: { type: integer }
+        utilizationRate: { type: number }
+        revenueToday: { type: number }
+        revenueWeek: { type: number }
+        activeReservations: { type: integer }
+        totalVehicles: { type: integer }
+
+    ActivityItem:
+      type: object
+      required: [id, kind, message, at]
+      properties:
+        id: { type: string }
+        kind:
+          type: string
+          enum: [reservation_created, reservation_completed, spot_occupied, spot_freed, vehicle_added]
+        message: { type: string }
+        spotCode: { type: string }
+        vehiclePlate: { type: string }
+        at: { type: string, format: date-time }
+
+    ZoneStat:
+      type: object
+      required: [zone, total, available, occupied, reserved]
+      properties:
+        zone: { type: string }
+        total: { type: integer }
+        available: { type: integer }
+        occupied: { type: integer }
+        reserved: { type: integer }
+
+    RevenuePoint:
+      type: object
+      required: [date, revenue, sessions]
+      properties:
+        date: { type: string, format: date }
+        revenue: { type: number }
+        sessions: { type: integer }
