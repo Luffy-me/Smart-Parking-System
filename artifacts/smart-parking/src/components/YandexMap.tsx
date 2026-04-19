@@ -17,8 +17,18 @@ const STATUS_HEX: Record<SpotStatus, string> = {
   maintenance: "#94a3b8",
 };
 
-const BASE_LAT = 55.7558;
-const BASE_LNG = 37.6173;
+// Chelyabinsk city center
+const BASE_LAT = 55.1602;
+const BASE_LNG = 61.4007;
+
+// Anchor coordinates for each pilot zone (real Chelyabinsk landmarks)
+const ZONE_ANCHORS: Record<string, [number, number]> = {
+  "SUSU Campus": [55.1604, 61.3735], // SUSU main building, pr. Lenina 76
+  "Revolution Sq": [55.1601, 61.4007], // pl. Revolyutsii, city center
+  Kirovka: [55.1648, 61.4017], // ul. Kirova pedestrian street
+  ChTZ: [55.1707, 61.4575], // Tractor Plant district, Tractor Builders Ave
+  Kalininsky: [55.1944, 61.3793], // Kalininsky district, Molodogvardeytsev
+};
 
 function hashCode(str: string): number {
   let h = 0;
@@ -30,12 +40,19 @@ function hashCode(str: string): number {
 }
 
 function spotCoord(spot: Spot): [number, number] {
-  const zoneSeed = hashCode(spot.zone);
-  const zoneLat = BASE_LAT + ((zoneSeed % 1000) / 1000) * 0.01;
-  const zoneLng = BASE_LNG + (((zoneSeed >> 10) % 1000) / 1000) * 0.01;
-  const codeSeed = hashCode(spot.code);
-  const dLat = (((codeSeed % 1000) / 1000) - 0.5) * 0.0025;
-  const dLng = ((((codeSeed >> 10) % 1000) / 1000) - 0.5) * 0.0025;
+  const anchor = ZONE_ANCHORS[spot.zone];
+  let zoneLat: number;
+  let zoneLng: number;
+  if (anchor) {
+    [zoneLat, zoneLng] = anchor;
+  } else {
+    const zoneSeed = hashCode(spot.zone);
+    zoneLat = BASE_LAT + ((zoneSeed % 1000) / 1000) * 0.02 - 0.01;
+    zoneLng = BASE_LNG + (((zoneSeed >> 10) % 1000) / 1000) * 0.02 - 0.01;
+  }
+  const codeSeed = hashCode(`${spot.code}:${spot.level}`);
+  const dLat = (((codeSeed % 1000) / 1000) - 0.5) * 0.0018;
+  const dLng = ((((codeSeed >> 10) % 1000) / 1000) - 0.5) * 0.0028;
   return [zoneLat + dLat, zoneLng + dLng];
 }
 
@@ -98,8 +115,8 @@ export function YandexMap({ spots, selectedSpotId, onSelect }: YandexMapProps) {
       .then((ymaps) => {
         if (cancelled || !containerRef.current) return;
         const map = new ymaps.Map(containerRef.current, {
-          center: [BASE_LAT + 0.005, BASE_LNG + 0.005],
-          zoom: 15,
+          center: [BASE_LAT, BASE_LNG],
+          zoom: 13,
           controls: ["zoomControl", "typeSelector", "fullscreenControl"],
         });
         mapRef.current = map;

@@ -152,6 +152,15 @@ export default function LiveMap() {
             onSelect={setSelectedSpotId}
           />
         )}
+        <div className="absolute bottom-3 left-3 z-[1] max-w-[260px] pointer-events-none">
+          <div className="rounded-lg border bg-background/90 backdrop-blur px-3 py-2 shadow-sm text-[11px] leading-snug">
+            <div className="flex items-center gap-1.5 font-semibold">
+              <GraduationCap className="h-3.5 w-3.5 text-primary" />
+              <span>{t("map.pilotTitle")}</span>
+            </div>
+            <p className="text-muted-foreground mt-1">{t("map.pilotNote")}</p>
+          </div>
+        </div>
       </div>
 
       <SlotGrid spots={filteredSpots} onSelect={setSelectedSpotId} selectedSpotId={selectedSpotId} />

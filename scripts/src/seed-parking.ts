@@ -13,15 +13,21 @@ async function main() {
   await db.delete(spotsTable);
   await db.delete(vehiclesTable);
 
-  // Spots — three zones, two levels each
-  const zones: { zone: string; level: number; count: number; rate: number }[] =
-    [
-      { zone: "North Wing", level: 1, count: 12, rate: 4.5 },
-      { zone: "North Wing", level: 2, count: 12, rate: 4.5 },
-      { zone: "Central Plaza", level: 1, count: 16, rate: 6.0 },
-      { zone: "Central Plaza", level: 2, count: 16, rate: 6.0 },
-      { zone: "South Wing", level: 1, count: 10, rate: 3.5 },
-    ];
+  // Spots — Chelyabinsk pilot zones (SUSU campus + central districts)
+  const zones: {
+    zone: string;
+    prefix: string;
+    level: number;
+    count: number;
+    rate: number;
+  }[] = [
+    { zone: "SUSU Campus", prefix: "SUS", level: 1, count: 14, rate: 4.0 },
+    { zone: "SUSU Campus", prefix: "SUS", level: 2, count: 14, rate: 4.0 },
+    { zone: "Revolution Sq", prefix: "REV", level: 1, count: 16, rate: 6.0 },
+    { zone: "Kirovka", prefix: "KIR", level: 1, count: 12, rate: 5.5 },
+    { zone: "ChTZ", prefix: "CTZ", level: 1, count: 12, rate: 3.5 },
+    { zone: "Kalininsky", prefix: "KAL", level: 1, count: 10, rate: 3.5 },
+  ];
 
   const types = ["standard", "compact", "accessible", "ev", "motorcycle"];
   const statuses = [
@@ -38,10 +44,6 @@ async function main() {
   const spotRows: (typeof spotsTable.$inferInsert)[] = [];
   let spotIndex = 0;
   for (const z of zones) {
-    const prefix = z.zone
-      .split(" ")
-      .map((w) => w[0])
-      .join("");
     for (let i = 0; i < z.count; i++) {
       spotIndex++;
       let type = types[0]!;
@@ -51,7 +53,7 @@ async function main() {
       else if (i % 3 === 0) type = "compact";
       const status = statuses[(spotIndex + z.level) % statuses.length]!;
       spotRows.push({
-        code: `${prefix}-L${z.level}-${String(i + 1).padStart(2, "0")}`,
+        code: `${z.prefix}-L${z.level}-${String(i + 1).padStart(2, "0")}`,
         zone: z.zone,
         level: z.level,
         type,

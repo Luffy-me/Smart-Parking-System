@@ -155,6 +155,10 @@ const DICT = {
       spots: "spots",
       zone: "Zone",
     },
+    map: {
+      pilotTitle: "SUSU Chelyabinsk pilot",
+      pilotNote: "Live bays across SUSU campus, Revolution Sq, Kirovka, ChTZ and Kalininsky district.",
+    },
     alerts: {
       maintenanceOverdue: "Maintenance overdue",
       maintenanceBody: "3 spots flagged for inspection over 24h.",
@@ -456,6 +460,10 @@ const DICT = {
       title: "Сетка мест",
       spots: "мест",
       zone: "Зона",
+    },
+    map: {
+      pilotTitle: "Пилот ЮУрГУ · Челябинск",
+      pilotNote: "Места на кампусе ЮУрГУ, пл. Революции, Кировке, ЧТЗ и Калининском районе.",
     },
     alerts: {
       maintenanceOverdue: "Просрочено ТО",
