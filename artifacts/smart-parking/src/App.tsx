@@ -24,6 +24,7 @@ import {
 } from "@workspace/api-client-react";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
 import { I18nProvider } from "@/lib/i18n";
@@ -353,6 +354,7 @@ function ClerkProviderWithRoutes() {
               <MotionConfig reducedMotion="user">
                 <AppRoutes />
                 <Toaster />
+                <SonnerToaster />
               </MotionConfig>
             </TooltipProvider>
           </I18nProvider>
