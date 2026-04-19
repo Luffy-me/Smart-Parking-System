@@ -21,7 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Car, Clock, Zap, Settings, ShieldCheck, Accessibility, Bike, CalendarRange } from "lucide-react";
+import { MapPin, Car, Clock, Zap, Settings, ShieldCheck, Accessibility, Bike, CalendarRange, DollarSign } from "lucide-react";
+import type { Spot } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format, addHours } from "date-fns";
@@ -107,7 +108,7 @@ export default function LiveMap() {
           
           <div className="w-px h-4 bg-border" />
           
-          <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as any)}>
+          <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as SpotStatus | "all")}>
             <SelectTrigger className="w-[140px] h-8 text-xs border-0 bg-transparent shadow-none focus:ring-0">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -192,7 +193,7 @@ export default function LiveMap() {
   );
 }
 
-function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: any, onStatusChange: (status: SpotStatus) => void, onClose: () => void }) {
+function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: Spot, onStatusChange: (status: SpotStatus) => void, onClose: () => void }) {
   const Icon = TYPE_ICONS[spot.type as SpotType] || Car;
   const [isCreatingRes, setIsCreatingRes] = useState(false);
   
@@ -364,24 +365,4 @@ function SpotDetailPanel({ spot, onStatusChange, onClose }: { spot: any, onStatu
       </div>
     </div>
   );
-}
-
-function DollarSign(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="12" x2="12" y1="2" y2="22" />
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-  )
 }

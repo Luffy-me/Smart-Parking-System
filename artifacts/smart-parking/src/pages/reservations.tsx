@@ -82,7 +82,7 @@ export default function Reservations() {
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center bg-card p-4 rounded-xl border">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ReservationStatus | "all")} className="w-full sm:w-auto">
           <TabsList className="grid w-full grid-cols-5 h-9">
             <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
             <TabsTrigger value="upcoming" className="text-xs">Upcoming</TabsTrigger>

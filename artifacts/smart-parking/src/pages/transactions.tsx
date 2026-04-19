@@ -51,7 +51,7 @@ export default function Transactions() {
           />
         </div>
         
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TransactionStatus | "all")}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
