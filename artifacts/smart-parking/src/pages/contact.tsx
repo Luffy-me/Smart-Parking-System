@@ -33,8 +33,8 @@ export default function Contact() {
     if (!form.name || !form.email || !form.message) return;
     setStatus("submitting");
     await new Promise((r) => setTimeout(r, 1100));
-    // Simulated network — flip to error 5% of the time for realism in demos.
-    const ok = Math.random() > 0.05;
+    // Simulated network — always succeeds for predictable demos.
+    const ok = true;
     if (ok) {
       setStatus("success");
       toast.success(t("contact.successTitle"));
