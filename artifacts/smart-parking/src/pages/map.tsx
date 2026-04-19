@@ -90,7 +90,7 @@ export default function LiveMap() {
   };
 
   return (
-    <div className="flex flex-col gap-6 h-[calc(100vh-8rem)]">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t("pages.mapTitle")}</h1>
@@ -129,7 +129,7 @@ export default function LiveMap() {
         </div>
       </div>
 
-      <div className="flex-1 bg-muted/30 rounded-xl border overflow-hidden relative flex flex-col">
+      <div className="flex-1 bg-muted/30 rounded-xl border overflow-hidden relative flex flex-col min-h-[420px]">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-pulse flex flex-col items-center gap-4">
@@ -146,6 +146,8 @@ export default function LiveMap() {
         )}
       </div>
 
+      <SlotGrid spots={filteredSpots} onSelect={setSelectedSpotId} selectedSpotId={selectedSpotId} />
+
       <Sheet open={!!selectedSpotId} onOpenChange={(open) => !open && setSelectedSpotId(null)}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
           {selectedSpot && (
@@ -157,6 +159,84 @@ export default function LiveMap() {
           )}
         </SheetContent>
       </Sheet>
+    </div>
+  );
+}
+
+function SlotGrid({ spots, onSelect, selectedSpotId }: { spots: Spot[]; onSelect: (id: string) => void; selectedSpotId: string | null }) {
+  const { t } = useI18n();
+  const grouped = useMemo(() => {
+    const map = new Map<string, Spot[]>();
+    for (const s of spots) {
+      const list = map.get(s.zone) ?? [];
+      list.push(s);
+      map.set(s.zone, list);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [spots]);
+
+  if (spots.length === 0) return null;
+
+  const legend: { key: SpotStatus; label: string; cls: string }[] = [
+    { key: "available", label: t("common.available"), cls: "bg-primary/15 border-primary text-primary" },
+    { key: "reserved", label: t("common.reserved"), cls: "bg-amber-500/15 border-amber-500 text-amber-600" },
+    { key: "occupied", label: t("common.occupied"), cls: "bg-destructive/15 border-destructive text-destructive" },
+    { key: "maintenance", label: t("common.maintenance"), cls: "bg-muted border-muted-foreground/40 text-muted-foreground" },
+  ];
+
+  return (
+    <div className="bg-card rounded-xl border p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t("slotGrid.title")} · {spots.length} {t("slotGrid.spots")}</h3>
+        <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-wider">
+          {legend.map((l) => (
+            <span key={l.key} className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full border ${l.cls}`}>
+              <span className="h-1.5 w-1.5 rounded-full bg-current" /> {l.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-4">
+        {grouped.map(([zone, zoneSpots]) => (
+          <div key={zone}>
+            <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">{t("slotGrid.zone")} {zone}</div>
+            <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 gap-2">
+              <AnimatePresence>
+                {zoneSpots.map((s, i) => {
+                  const status = s.status as SpotStatus;
+                  const type = s.type as SpotType;
+                  const isSelected = s.id === selectedSpotId;
+                  const base = "relative aspect-square rounded-md border-2 flex items-center justify-center text-[10px] font-bold tabular-nums cursor-pointer transition-all";
+                  const cls =
+                    status === "available" ? "bg-primary/10 border-primary/60 text-primary hover:bg-primary/20" :
+                    status === "reserved" ? "bg-amber-500/10 border-amber-500/70 text-amber-700 dark:text-amber-300 soft-pulse" :
+                    status === "occupied" ? "bg-destructive border-destructive text-destructive-foreground" :
+                    "bg-muted border-muted-foreground/30 text-muted-foreground/70";
+                  const ring = type === "ev" ? "ring-2 ring-emerald-400/70 ring-offset-1 ring-offset-background" : "";
+                  const sel = isSelected ? "scale-110 z-10 shadow-lg" : "";
+                  return (
+                    <motion.button
+                      key={s.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ delay: Math.min(i * 0.01, 0.3) }}
+                      onClick={() => onSelect(s.id)}
+                      title={`${s.code} · ${s.type} · ${s.status}`}
+                      className={`${base} ${cls} ${ring} ${sel} ${status === "available" ? "glow-pulse" : ""}`}
+                    >
+                      <span className="leading-none">{s.code.replace(/[^0-9]/g, "").slice(-2) || s.code.slice(-2)}</span>
+                      {type === "accessible" && <Accessibility className="absolute -top-1 -right-1 h-3 w-3 text-blue-500 bg-background rounded-full p-px" />}
+                      {type === "ev" && <Zap className="absolute -top-1 -right-1 h-3 w-3 text-emerald-500 bg-background rounded-full p-px" />}
+                    </motion.button>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

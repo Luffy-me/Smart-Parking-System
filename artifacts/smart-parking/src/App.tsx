@@ -35,6 +35,10 @@ import Reservations from "@/pages/reservations";
 import Vehicles from "@/pages/vehicles";
 import Transactions from "@/pages/transactions";
 import SpotsAdmin from "@/pages/spots";
+import EVCharging from "@/pages/ev-charging";
+import Analytics from "@/pages/analytics";
+import Pricing from "@/pages/pricing";
+import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -64,7 +68,7 @@ const clerkAppearance = {
     logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
   },
   variables: {
-    colorPrimary: "hsl(221, 83%, 53%)",
+    colorPrimary: "hsl(173, 80%, 36%)",
     colorBackground: "hsl(0, 0%, 100%)",
     colorInputBackground: "hsl(0, 0%, 100%)",
     colorText: "hsl(222, 47%, 11%)",
@@ -116,9 +120,9 @@ const clerkElementStyles = {
   socialButtonsBlockButtonText: { color: "hsl(222, 47%, 11%)" },
   formFieldLabel: { color: "hsl(222, 47%, 11%)" },
   footerActionText: { color: "hsl(215, 16%, 47%)" },
-  footerActionLink: { color: "hsl(221, 83%, 53%)" },
+  footerActionLink: { color: "hsl(173, 80%, 36%)" },
   dividerText: { color: "hsl(215, 16%, 47%)" },
-  identityPreviewEditButton: { color: "hsl(221, 83%, 53%)" },
+  identityPreviewEditButton: { color: "hsl(173, 80%, 36%)" },
   formFieldSuccessText: { color: "hsl(142, 71%, 45%)" },
   alertText: { color: "hsl(0, 84%, 60%)" },
 };
@@ -245,6 +249,12 @@ function ProtectedRoutes() {
             <Route path="/spots">
               <ProtectedApp operatorOnly>{() => <SpotsAdmin />}</ProtectedApp>
             </Route>
+            <Route path="/ev-charging" component={EVCharging} />
+            <Route path="/analytics">
+              <ProtectedApp operatorOnly>{() => <Analytics />}</ProtectedApp>
+            </Route>
+            <Route path="/pricing" component={Pricing} />
+            <Route path="/settings" component={SettingsPage} />
             <Route component={NotFound} />
           </Switch>
         </AppShell>

@@ -14,11 +14,16 @@ import {
   Sun,
   Moon,
   LogOut,
+  Zap,
+  BarChart3,
+  Tag,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import { Logo } from "@/components/Logo";
 import type { CurrentUser } from "@workspace/api-client-react";
 
 type NavItem = {
@@ -33,8 +38,12 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/map", labelKey: "nav.map", icon: Map },
   { href: "/reservations", labelKey: "nav.reservations", icon: CalendarRange },
   { href: "/vehicles", labelKey: "nav.vehicles", icon: CarFront },
+  { href: "/ev-charging", labelKey: "nav.evCharging", icon: Zap },
+  { href: "/analytics", labelKey: "nav.analytics", icon: BarChart3, operatorOnly: true },
   { href: "/transactions", labelKey: "nav.transactions", icon: Receipt },
   { href: "/spots", labelKey: "nav.spots", icon: Settings2, operatorOnly: true },
+  { href: "/pricing", labelKey: "nav.pricing", icon: Tag },
+  { href: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
 
 function initialsOf(user: CurrentUser): string {
@@ -150,10 +159,8 @@ export function AppShell({
       {/* Mobile Header */}
       <header className="md:hidden flex items-center justify-between p-4 border-b bg-card">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Map className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-lg">{t("appName")}</span>
+          <Logo className="h-8 w-8" />
+          <span className="font-bold text-lg tracking-tight">{t("appName")}</span>
         </div>
         <div className="flex items-center gap-1">
           <HeaderActions />
@@ -165,10 +172,8 @@ export function AppShell({
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-4 flex flex-col">
               <div className="flex items-center gap-2 mb-8 mt-4">
-                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Map className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-xl">{t("appName")}</span>
+                <Logo className="h-9 w-9" />
+                <span className="font-bold text-xl tracking-tight">{t("appName")}</span>
               </div>
               <nav className="flex flex-col gap-1 flex-1">
                 <NavLinks />
@@ -182,10 +187,11 @@ export function AppShell({
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r bg-card h-screen sticky top-0">
         <div className="p-6 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-            <Map className="h-6 w-6 text-primary-foreground" />
+          <Logo className="h-10 w-10" />
+          <div className="flex flex-col leading-tight">
+            <span className="font-bold text-2xl tracking-tight">{t("appName")}</span>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Smart Mobility</span>
           </div>
-          <span className="font-bold text-2xl tracking-tight">{t("appName")}</span>
         </div>
         <nav className="flex-1 px-4 py-4 flex flex-col gap-1 overflow-y-auto">
           <NavLinks />
@@ -199,7 +205,7 @@ export function AppShell({
           <HeaderActions />
         </header>
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-6xl mx-auto w-full">{children}</div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </div>
       </main>
     </div>

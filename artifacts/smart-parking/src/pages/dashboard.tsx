@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { Car, Map, CalendarRange, DollarSign, Activity, AlertCircle } from "lucide-react";
+import { Car, Map, CalendarRange, DollarSign, Activity, AlertCircle, Flame, TrendingUp, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 
@@ -56,7 +57,7 @@ export default function Dashboard() {
                 <DollarSign className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${summary.revenueToday.toFixed(2)}</div>
+                <div className="text-2xl font-bold tabular-nums">${summary.revenueToday.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
                   Week: ${summary.revenueWeek.toFixed(2)}
                 </p>
@@ -70,7 +71,7 @@ export default function Dashboard() {
                 <Map className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{(summary.utilizationRate * 100).toFixed(1)}%</div>
+                <div className="text-2xl font-bold tabular-nums">{(summary.utilizationRate * 100).toFixed(1)}%</div>
                 <p className="text-xs text-muted-foreground">
                   {summary.occupiedSpots} occupied / {summary.totalSpots} total
                 </p>
@@ -84,7 +85,7 @@ export default function Dashboard() {
                 <CalendarRange className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{summary.activeReservations}</div>
+                <div className="text-2xl font-bold tabular-nums">{summary.activeReservations}</div>
                 <p className="text-xs text-muted-foreground">
                   {summary.reservedSpots} spots marked reserved
                 </p>
@@ -98,7 +99,7 @@ export default function Dashboard() {
                 <Car className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{summary.totalVehicles}</div>
+                <div className="text-2xl font-bold tabular-nums">{summary.totalVehicles}</div>
                 <p className="text-xs text-muted-foreground">
                   {summary.availableSpots} spots available now
                 </p>
@@ -211,11 +212,12 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Zone Utilization</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>{t("metrics.zoneUtilization")}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
           {isLoadingZones ? (
             <Skeleton className="w-full h-full" />
           ) : zones && zones.length > 0 ? (
@@ -254,6 +256,34 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><AlertCircle className="h-5 w-5 text-primary" /> {t("metrics.alerts")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[
+            { icon: Flame, tone: "primary", title: t("metrics.peakHour"), value: "18:00", body: t("alerts.peakBody") },
+            { icon: AlertCircle, tone: "destructive", title: t("alerts.maintenanceOverdue"), value: `${t("slotGrid.zone")} C`, body: t("alerts.maintenanceBody") },
+            { icon: Zap, tone: "chart-2", title: t("alerts.evSurge"), value: "+34%", body: t("alerts.evSurgeBody") },
+            { icon: TrendingUp, tone: "primary", title: t("metrics.avgDuration"), value: "84m", body: t("alerts.durationBody") },
+          ].map((a, i) => (
+            <motion.div key={a.title} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover-elevate">
+              <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0`} style={{ backgroundColor: `hsl(var(--${a.tone}) / .12)`, color: `hsl(var(--${a.tone}))` }}>
+                <a.icon className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold">{a.title}</span>
+                  <Badge variant="outline" className="tabular-nums text-[10px]">{a.value}</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{a.body}</p>
+              </div>
+            </motion.div>
+          ))}
+        </CardContent>
+      </Card>
+      </div>
     </div>
   );
 }

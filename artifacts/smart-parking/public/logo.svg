@@ -1,4 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="hsl(221, 83%, 53%)"/>
-  <path d="M22 18h12.5c5.8 0 9.5 3.4 9.5 8.6 0 5.3-3.7 8.7-9.5 8.7H28V46h-6V18zm12 11.9c2.7 0 4.3-1.3 4.3-3.3 0-2-1.6-3.3-4.3-3.3H28v6.6h6z" fill="white"/>
+  <defs>
+    <linearGradient id="parqGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#parqGrad)"/>
+  <path d="M22 16h12.5a10.5 10.5 0 0 1 0 21H28v11h-6V16Zm6 6v9h6.2a4.5 4.5 0 0 0 0-9H28Z" fill="#fff"/>
+  <circle cx="48" cy="48" r="4" fill="#fff" fill-opacity=".95"/>
+  <circle cx="48" cy="48" r="2" fill="#0d9488"/>
 </svg>
