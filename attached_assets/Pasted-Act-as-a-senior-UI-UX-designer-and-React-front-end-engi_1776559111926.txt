@@ -1,0 +1,100 @@
+Act as a senior UI/UX designer and React front-end engineer. Build a premium smart parking system web application using React, Tailwind CSS, and Framer Motion.
+
+Product:
+A smart parking platform for drivers, parking operators, malls, offices, airports, and smart cities. The app should help users view parking availability, reserve spots, monitor occupancy, manage EV charging bays, and analyze parking trends.
+
+Core design direction:
+- Design it as a real production-grade dashboard, not a generic landing page
+- Tone: intelligent, urban, efficient, modern, reliable
+- Style: premium mobility-tech interface with clean surfaces, strong hierarchy, subtle futuristic details
+- Keep the UI compact and data-oriented
+- Use one main accent color only: teal, emerald, or cyan
+- Include both light mode and dark mode with a toggle
+- Use a neutral base palette with restrained highlights
+- Make the design feel like a SaaS analytics app with a beautiful marketing hero at the top
+
+Tech stack:
+- React
+- Tailwind CSS
+- Framer Motion
+- Lucide React icons
+- Recharts or Chart.js for analytics
+- Use clean reusable components and responsive layouts
+- Use in-memory mock data only
+
+App structure:
+Build the page/app with these main areas:
+1. Sticky top navbar
+2. Sidebar navigation on desktop
+3. Mobile navigation drawer or bottom-friendly navigation
+4. Hero / overview section for the platform
+5. KPI cards row
+6. Occupancy analytics section
+7. Parking slot status visualization
+8. Interactive parking map or zone layout
+9. Reservation preview / booking flow
+10. EV charging slot section
+11. Alerts / incidents / peak time insights
+12. Pricing or plan cards
+13. Testimonial / trust / partner section
+14. CTA footer
+
+Navigation items:
+- Dashboard
+- Live Map
+- Parking Slots
+- Reservations
+- EV Charging
+- Analytics
+- Pricing
+- Settings
+
+Visual requirements:
+- Premium dashboard layout with layered cards and subtle depth
+- Compact typography suitable for a web app
+- Strong grid alignment and generous but controlled spacing
+- Avoid oversized headings inside the dashboard
+- Use tabular numbers for metrics
+- Use elegant cards with subtle borders and soft shadows
+- Add a custom smart parking SVG logo
+- Add realistic status colors for:
+  - available
+  - occupied
+  - reserved
+  - EV charging
+  - accessible / disabled
+- Include realistic widgets such as:
+  - available slots count
+  - occupancy rate
+  - active reservations
+  - peak hours
+  - revenue trend
+  - average parking duration
+  - EV charger usage
+
+Hero section:
+- Create a visually striking hero that introduces the smart parking platform
+- Include animated route lines, signal dots, grid overlays, and city-mobility inspired UI patterns
+- Add a strong headline and product summary
+- Include one primary CTA and one secondary CTA
+- Make the hero feel modern and high-end without looking like a generic AI gradient template
+
+Dashboard content:
+- KPI cards should appear first
+- Trend charts and analytics should appear second
+- Detailed tables, slot breakdowns, and operational insights should appear below
+- Include a parking occupancy chart, hourly usage graph, and zone comparison
+- Add filters such as date range, parking zone, vehicle type, and slot type
+- Include table rows with realistic sample parking data
+
+Parking visualization:
+- Add a parking slot grid or mini map showing spot states visually
+- Each slot should animate subtly on hover or update
+- Available spots can glow softly
+- Occupied spots should look filled and stable
+- Reserved spots should pulse lightly
+- EV spots should have a distinct icon or ring
+- Accessible spots should be clearly labeled
+
+Motion direction:
+Use Framer Motion 
