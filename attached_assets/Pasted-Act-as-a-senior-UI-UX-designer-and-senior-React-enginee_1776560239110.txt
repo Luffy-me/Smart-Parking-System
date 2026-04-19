@@ -1,0 +1,244 @@
+Act as a senior UI/UX designer and senior React engineer building inside Replit.
+
+Build a premium smart parking system web application using:
+- React
+- Tailwind CSS
+- Framer Motion
+- React Router
+- Lucide React icons
+- Recharts or Chart.js
+- clean reusable components
+- realistic mock data
+
+Context:
+This is a smart parking system project under South Ural State University (SUSU).
+The application is currently available only in Chelyabinsk, Russia.
+Make this location and university affiliation visible in the interface in a polished, trustworthy way.
+
+Replit implementation requirements:
+- Structure the project like a real React app suitable for Replit
+- Use npm packages normally supported in Replit
+- Keep the code modular and readable
+- Create reusable components, organized sections, and clean page routing
+- Build production-style front-end code, not a quick prototype
+- Include clear file structure suggestions
+- Make the app easy to extend later
+
+Brand direction:
+- Tone: urban, intelligent, reliable, innovative, modern
+- Style: premium mobility-tech dashboard with subtle city-tech atmosphere
+- Use a neutral base and one primary accent color only, preferably teal, emerald, or cyan
+- Support light mode and dark mode with a toggle
+- Keep dashboard typography compact and realistic
+- Hero and About page can be more expressive, but app UI should remain practical
+
+Mandatory product messaging:
+- Show “Currently available in Chelyabinsk” prominently but elegantly
+- Show “Project under South Ural State University (SUSU)” in hero, About page, and footer
+- Keep the rollout messaging clear in CTA areas and reservation sections
+- Include a small location badge like “Chelyabinsk only”
+
+Pages to build with React Router:
+1. Home
+2. About
+3. Contact
+4. Dashboard
+5. Analytics
+6. Reservations
+
+Navigation:
+- Home
+- About
+- Contact
+- Dashboard
+- Live Map
+- Reservations
+- Analytics
+
+Home page:
+- Sticky top navbar
+- Premium hero section
+- KPI cards
+- Parking availability overview
+- Parking slot visualization
+- Reservation preview
+- EV charging highlight
+- Feature storytelling section
+- Testimonials / trust block
+- Beautiful premium footer
+
+About page:
+- Explain the project as a smart parking initiative under South Ural State University
+- Mention that the current rollout is only in Chelyabinsk
+- Include sections such as:
+  - Project mission
+  - Why Chelyabinsk
+  - University-backed innovation
+  - Smart city vision
+  - Technology behind the system
+- Use high-quality editorial layout with beautiful images
+- Add a timeline or milestone section with elegant animation
+
+Contact page:
+- Beautiful Contact Us page
+- Contact form
+- Collaboration / university / research inquiry block
+- Chelyabinsk location block
+- SUSU affiliation block
+- Response time / project support info
+- Elegant cards and page transitions
+- Loading, success, and error states for the form
+
+Dashboard page:
+- Sticky top bar and optional sidebar
+- KPI cards first
+- Analytics and trend charts second
+- Tables and detailed slot / reservation insights below
+- Realistic parking data and status badges
+- Filters for zone, date, vehicle type, and slot type
+- Compact layout like a real SaaS dashboard
+
+Analytics page:
+- Occupancy rate chart
+- Hourly parking usage chart
+- Zone comparison cards
+- Revenue / utilization trends
+- EV charging usage widget
+- Animated counters and polished chart cards
+
+Reservations page:
+- Booking flow preview
+- Reservation list
+- Status chips
+- Empty states
+- Detail cards
+- Elegant state transitions
+
+Image quality requirements:
+- Use high-quality, visually impressive images
+- Images should feel premium, modern, and curated
+- Prefer visuals related to:
+  - smart city infrastructure
+  - urban roads and parking lots
+  - cars, sensors, route systems
+  - mobility technology
+  - modern control rooms / data dashboards
+  - university / innovation / research atmosphere
+  - Chelyabinsk context where suitable
+- Avoid cheap placeholder images
+- Use hero-quality visuals, editorial image blocks, and strong visual composition
+- Integrate images with overlays, soft gradients, masks, or blur where appropriate
+
+Animation quality upgrade:
+Use Framer Motion professionally and make motion feel smooth, premium, and intentional.
+
+Animation rules:
+- Motion should improve clarity and polish, not distract
+- Frequent actions should be subtle
+- Hero, storytelling sections, and page transitions can be more expressive
+- Use smooth easing and tasteful spring animation
+- Use staggered reveals for groups of cards and content blocks
+- Use AnimatePresence for route transitions, mobile menu, drawers, toasts, and modal states
+- Use layout animations for tab highlights, active nav indicators, and card changes
+- Use whileHover only on clickable elements
+- Use whileTap for mobile-friendly press feedback
+- Use in-view animations for sections entering the viewport
+- Use premium image reveal effects with fade, blur, masking, and layered depth
+- Add subtle pulse/ripple animation for live map markers and reserved parking states
+- Animate KPI counters when they enter view
+- Add animated footer reveal
+- Respect prefers-reduced-motion
+- Keep mobile animation lighter than desktop
+
+Scrolling experience:
+- Make scrolling feel smooth and premium
+- Hero should have layered motion and refined visual depth
+- About page should include storytelling-on-scroll
+- Dashboard sections should remain readable and stable
+- Contact page should reveal elegantly
+- Avoid heavy parallax in data-heavy sections
+- Keep all scroll motion smooth and performance-friendly
+
+Visual requirements:
+- Premium smart parking SVG logo
+- Compact app typography
+- Beautiful card surfaces and subtle borders
+- Consistent radius and shadow system
+- Elegant chips, badges, and live indicators
+- Strong status design for available, occupied, reserved, EV, and accessible spots
+- Premium dark footer that feels complete and intentional
+
+Footer requirements:
+Create a beautiful premium footer with:
+- logo
+- short project description
+- nav links
+- About and Contact links
+- “Currently available in Chelyabinsk”
+- “Project under South Ural State University (SUSU)”
+- contact placeholders
+- update/newsletter field
+- social or institutional icons
+- subtle divider and elegant reveal animation
+
+Suggested React component structure:
+- components/layout/Navbar
+- components/layout/Sidebar
+- components/layout/Footer
+- components/common/ThemeToggle
+- components/common/SectionHeader
+- components/common/StatusBadge
+- components/common/KpiCard
+- components/common/LoadingSkeleton
+- components/home/HeroSection
+- components/home/FeatureStory
+- components/dashboard/AnalyticsPanel
+- components/dashboard/SlotGrid
+- components/dashboard/ParkingMap
+- components/dashboard/ReservationPanel
+- components/about/AboutStorySection
+- components/about/TimelineSection
+- components/contact/ContactForm
+- components/contact/ContactInfoCards
+- pages/Home
+- pages/About
+- pages/Contact
+- pages/Dashboard
+- pages/Analytics
+- pages/Reservations
+
+Suggested project structure:
+- src/
+  - components/
+  - pages/
+  - data/
+  - hooks/
+  - utils/
+  - assets/
+  - App.jsx
+  - main.jsx
+
+Code quality requirements:
+- Use clean React patterns
+- Reuse data-driven components
+- Keep styles consistent
+- Make all pages responsive
+- Make all interactions polished
+- Add accessible labels and semantic HTML
+- Touch targets at least 44x44px
+- Use realistic sample content and sample parking data
+- Ensure both dark and light themes look complete
+
+Important constraints:
+- Do not build a generic startup landing page
+- Do not make the dashboard overly spacious
+- Do not use low-quality placeholder images
+- Do not overuse multiple bright accent colors
+- Do not add meaningless decorative blobs
+- Do not over-animate charts or tables
+- Do not forget that availability is currently limited to Chelyabinsk
+- Do not forget that this is a SUSU project
+- Do not make the footer plain
+
+Final output:
+Generate a complete Replit-ready React application with Home, About, Contact, Dashboard, Analytics, and Reservations pages, high-quality visuals, premium animations, a beautiful footer, and clear messaging that the application is currently available only in Chelyabinsk and is a project under South Ural State University (SUSU).
