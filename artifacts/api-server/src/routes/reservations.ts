@@ -88,6 +88,7 @@ async function hasOverlappingReservation(
   end: Date,
   excludeReservationId?: string,
 ) {
+  // Time-range overlap: existing.start < new.end && existing.end > new.start.
   const conds = [
     eq(reservationsTable.spotId, spotId),
     inArray(reservationsTable.status, ["upcoming", "active"]),
@@ -111,6 +112,8 @@ async function recomputeSpotStatus(
   spotId: string,
   excludeReservationId?: string,
 ) {
+  // Spot is occupied when a live reservation overlaps "now", reserved when only
+  // future reservations exist, and available otherwise.
   const now = new Date();
   const occupiedConds = [
     eq(reservationsTable.spotId, spotId),

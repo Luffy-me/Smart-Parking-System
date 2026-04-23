@@ -44,6 +44,7 @@ async function loadOrCreateUser(
   }
 
   return db.transaction(async (tx) => {
+    // Serialize bootstrap role assignment so only one first-time user can become operator.
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtext('users_bootstrap_operator_role'))`,
     );
