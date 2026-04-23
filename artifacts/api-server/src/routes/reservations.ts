@@ -82,6 +82,7 @@ async function findOwnedReservation(
 }
 
 async function hasOverlappingReservation(
+  executor: Pick<typeof db, "select">,
   spotId: string,
   start: Date,
   end: Date,
@@ -97,7 +98,7 @@ async function hasOverlappingReservation(
     conds.push(ne(reservationsTable.id, excludeReservationId));
   }
 
-  const [conflict] = await db
+  const [conflict] = await executor
     .select({ id: reservationsTable.id })
     .from(reservationsTable)
     .where(and(...conds))
@@ -202,18 +203,24 @@ router.post("/reservations", requireAuth, async (req, res) => {
     return;
   }
 
-  const hasOverlap = await hasOverlappingReservation(body.spotId, start, end);
-  if (hasOverlap) {
-    res.status(409).json({ error: "Spot is already reserved for this time range" });
-    return;
-  }
-
   const hours = (end.getTime() - start.getTime()) / 3_600_000;
   const totalCost = Math.round(hours * spot.hourlyRate * 100) / 100;
   const now = new Date();
   const status = start > now ? "upcoming" : end > now ? "active" : "completed";
+  let createConflict = false;
 
   const [row] = await db.transaction(async (tx) => {
+    const hasOverlap = await hasOverlappingReservation(
+      tx,
+      body.spotId,
+      start,
+      end,
+    );
+    if (hasOverlap) {
+      createConflict = true;
+      return [];
+    }
+
     const [inserted] = await tx
       .insert(reservationsTable)
       .values({
@@ -241,6 +248,12 @@ router.post("/reservations", requireAuth, async (req, res) => {
   });
 
   if (!row) {
+    if (createConflict) {
+      res
+        .status(409)
+        .json({ error: "Spot is already reserved for this time range" });
+      return;
+    }
     res.status(500).json({ error: "Failed to create reservation" });
     return;
   }
@@ -283,18 +296,6 @@ router.patch("/reservations/:id", requireAuth, async (req, res) => {
   }
 
   const nextStatus = body.status ?? owned.reservation.status;
-  if (nextStatus === "active" || nextStatus === "upcoming") {
-    const hasOverlap = await hasOverlappingReservation(
-      owned.reservation.spotId,
-      startTime,
-      endTime,
-      id,
-    );
-    if (hasOverlap) {
-      res.status(409).json({ error: "Spot is already reserved for this time range" });
-      return;
-    }
-  }
 
   const updates: Partial<typeof reservationsTable.$inferInsert> = {};
   if (body.status) updates.status = body.status;
@@ -305,8 +306,23 @@ router.patch("/reservations/:id", requireAuth, async (req, res) => {
     const hours = (endTime.getTime() - startTime.getTime()) / 3_600_000;
     updates.totalCost = Math.round(hours * hourlyRate * 100) / 100;
   }
+  let updateConflict = false;
 
   const [row] = await db.transaction(async (tx) => {
+    if (nextStatus === "active" || nextStatus === "upcoming") {
+      const hasOverlap = await hasOverlappingReservation(
+        tx,
+        owned.reservation.spotId,
+        startTime,
+        endTime,
+        id,
+      );
+      if (hasOverlap) {
+        updateConflict = true;
+        return [];
+      }
+    }
+
     const [updated] = await tx
       .update(reservationsTable)
       .set(updates)
@@ -341,6 +357,12 @@ router.patch("/reservations/:id", requireAuth, async (req, res) => {
   });
 
   if (!row) {
+    if (updateConflict) {
+      res
+        .status(409)
+        .json({ error: "Spot is already reserved for this time range" });
+      return;
+    }
     res.status(404).json({ error: "Reservation not found" });
     return;
   }
