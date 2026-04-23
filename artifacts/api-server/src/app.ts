@@ -55,7 +55,7 @@ const configuredCorsOrigins = (process.env.CORS_ORIGINS ?? "")
   .filter(Boolean);
 if (process.env.NODE_ENV === "production" && configuredCorsOrigins.length === 0) {
   throw new Error(
-    "The environment variable CORS_ORIGINS must be set in production (comma-separated allowed origins).",
+    "CORS_ORIGINS environment variable must be set in production mode with at least one allowed origin (e.g., https://example.com,https://app.example.com).",
   );
 }
 const defaultDevCorsOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
