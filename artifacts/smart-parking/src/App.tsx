@@ -229,8 +229,32 @@ function PublicPricingPage() {
   );
 }
 
+function ApiErrorMessage() {
+  return (
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4 text-center">
+      <p className="text-lg font-semibold text-destructive">
+        Unable to reach the server
+      </p>
+      <p className="max-w-sm text-sm text-muted-foreground">
+        The app could not connect to the API server. Make sure the backend is
+        running and the <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">VITE_API_BASE_URL</code> environment
+        variable is set correctly, then reload the page.
+      </p>
+      <button
+        className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        onClick={() => window.location.reload()}
+      >
+        Reload
+      </button>
+    </div>
+  );
+}
+
 function SignedInHome() {
-  const { data: user, isLoading } = useGetCurrentUser();
+  const { data: user, isLoading, isError } = useGetCurrentUser();
+  if (isError) {
+    return <ApiErrorMessage />;
+  }
   if (isLoading || !user) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center text-muted-foreground">
@@ -252,7 +276,10 @@ function ProtectedApp({
   children: (user: CurrentUser) => React.ReactNode;
   operatorOnly?: boolean;
 }) {
-  const { data: user, isLoading } = useGetCurrentUser();
+  const { data: user, isLoading, isError } = useGetCurrentUser();
+  if (isError) {
+    return <ApiErrorMessage />;
+  }
   if (isLoading) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center text-muted-foreground">
