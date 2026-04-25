@@ -3,7 +3,7 @@ import {
   ClerkProvider,
   SignIn,
   SignUp,
-  Show,
+  useAuth,
   useClerk,
 } from "@clerk/react";
 import {
@@ -188,18 +188,37 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
+function AuthLoadingScreen() {
+  return (
+    <div className="flex min-h-[100dvh] items-center justify-center text-muted-foreground">
+      Loading…
+    </div>
+  );
+}
+
+function AuthStateSwitch({
+  signedIn,
+  signedOut,
+}: {
+  signedIn: React.ReactNode;
+  signedOut: React.ReactNode;
+}) {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) return <AuthLoadingScreen />;
+  return <>{isSignedIn ? signedIn : signedOut}</>;
+}
+
 function HomeRedirect() {
   return (
-    <>
-      <Show when="signed-in">
-        <SignedInHome />
-      </Show>
-      <Show when="signed-out">
+    <AuthStateSwitch
+      signedIn={<SignedInHome />}
+      signedOut={
         <MarketingLayout>
           <Landing />
         </MarketingLayout>
-      </Show>
-    </>
+      }
+    />
   );
 }
 
@@ -332,17 +351,17 @@ function AppRoutes() {
       <Route path="/sign-in/*?" component={SignInPage} />
       <Route path="/sign-up/*?" component={SignUpPage} />
       <Route>
-        <Show when="signed-in">
-          <ProtectedRoutes />
-        </Show>
-        <Show when="signed-out">
-          <Switch>
-            <Route path="/pricing" component={PublicPricingPage} />
-            <Route>
-              <Redirect to="/" />
-            </Route>
-          </Switch>
-        </Show>
+        <AuthStateSwitch
+          signedIn={<ProtectedRoutes />}
+          signedOut={
+            <Switch>
+              <Route path="/pricing" component={PublicPricingPage} />
+              <Route>
+                <Redirect to="/" />
+              </Route>
+            </Switch>
+          }
+        />
       </Route>
     </Switch>
   );
