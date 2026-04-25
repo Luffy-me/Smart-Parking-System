@@ -269,10 +269,44 @@ function ApiErrorMessage() {
   );
 }
 
+function ApiAuthErrorMessage() {
+  return (
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4 text-center">
+      <p className="text-lg font-semibold text-destructive">
+        Unable to authenticate with the API
+      </p>
+      <p className="max-w-sm text-sm text-muted-foreground">
+        The API responded with an authorization error. Check Clerk/API auth
+        configuration (including domain, proxy, and CORS settings), then reload
+        the page.
+      </p>
+      <button
+        className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        onClick={() => window.location.reload()}
+      >
+        Reload
+      </button>
+    </div>
+  );
+}
+
+function getAuthApiErrorKind(error: unknown): "unauthorized" | "other" {
+  if (!error || typeof error !== "object") return "other";
+  if (!("status" in error)) return "other";
+
+  const status = (error as { status?: unknown }).status;
+  if (status === 401 || status === 403) return "unauthorized";
+  return "other";
+}
+
 function SignedInHome() {
-  const { data: user, isLoading, isError } = useGetCurrentUser();
+  const { data: user, isLoading, isError, error } = useGetCurrentUser();
   if (isError) {
-    return <ApiErrorMessage />;
+    return getAuthApiErrorKind(error) === "unauthorized" ? (
+      <ApiAuthErrorMessage />
+    ) : (
+      <ApiErrorMessage />
+    );
   }
   if (isLoading || !user) {
     return (
@@ -295,9 +329,13 @@ function ProtectedApp({
   children: (user: CurrentUser) => React.ReactNode;
   operatorOnly?: boolean;
 }) {
-  const { data: user, isLoading, isError } = useGetCurrentUser();
+  const { data: user, isLoading, isError, error } = useGetCurrentUser();
   if (isError) {
-    return <ApiErrorMessage />;
+    return getAuthApiErrorKind(error) === "unauthorized" ? (
+      <ApiAuthErrorMessage />
+    ) : (
+      <ApiErrorMessage />
+    );
   }
   if (isLoading) {
     return (
