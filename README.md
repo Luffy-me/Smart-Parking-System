@@ -47,6 +47,22 @@ pnpm run typecheck
 pnpm run build
 ```
 
+## Appwrite build settings
+
+Use this build command in Appwrite to pin pnpm and keep lockfile checks strict:
+
+```bash
+corepack enable && corepack prepare pnpm@10.33.2 --activate && pnpm install --frozen-lockfile && pnpm run build
+```
+
+If deploy fails with a lockfile mismatch, retry once with:
+
+```bash
+corepack enable && corepack prepare pnpm@10.33.2 --activate && pnpm install --no-frozen-lockfile && pnpm run build
+```
+
+Keep pnpm pinned to `10.33.2` in all CI/deploy environments.
+
 ## Deploy architecture
 
 Use one of these setups:
