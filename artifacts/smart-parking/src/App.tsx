@@ -292,14 +292,14 @@ function ProtectedApp({
 }) {
   const { data: user, isLoading, isError, error } = useGetCurrentUser();
   if (isError) {
-    // HTTP 401 → the session isn't recognised by the backend; go sign in again.
-    if (error instanceof ApiError && error.status === 401) {
-      return <Redirect to="/sign-in" />;
-    }
     // Network error (backend completely unreachable) → fall back to the public
     // landing page so the site is never fully blocked.
     if (!(error instanceof ApiError)) {
       return <Redirect to="/" />;
+    }
+    // HTTP 401 → the session isn't recognised by the backend; go sign in again.
+    if (error.status === 401) {
+      return <Redirect to="/sign-in" />;
     }
     return <ApiErrorMessage />;
   }
