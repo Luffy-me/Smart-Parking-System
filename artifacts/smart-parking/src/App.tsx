@@ -230,6 +230,7 @@ function PublicPricingPage() {
 }
 
 function ApiErrorMessage() {
+  const { signOut } = useClerk();
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4 text-center">
       <p className="text-lg font-semibold text-destructive">
@@ -240,12 +241,20 @@ function ApiErrorMessage() {
         running and the <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">VITE_API_BASE_URL</code> environment
         variable is set correctly, then reload the page.
       </p>
-      <button
-        className="mt-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        onClick={() => window.location.reload()}
-      >
-        Reload
-      </button>
+      <div className="mt-2 flex gap-3">
+        <button
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.reload()}
+        >
+          Reload
+        </button>
+        <button
+          className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+          onClick={() => signOut({ redirectUrl: basePath || "/" })}
+        >
+          Sign out
+        </button>
+      </div>
     </div>
   );
 }
@@ -253,7 +262,11 @@ function ApiErrorMessage() {
 function SignedInHome() {
   const { data: user, isLoading, isError } = useGetCurrentUser();
   if (isError) {
-    return <ApiErrorMessage />;
+    return (
+      <MarketingLayout>
+        <Landing />
+      </MarketingLayout>
+    );
   }
   if (isLoading || !user) {
     return (
