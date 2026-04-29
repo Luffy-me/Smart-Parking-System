@@ -10,11 +10,10 @@ import { logger } from "./logger";
 const TICK_INTERVAL_MS = 30_000;
 
 export async function processReservationTransitions(now: Date = new Date()) {
-  return db.transaction(async (tx) => {
     let activated = 0;
     let completed = 0;
 
-    const toActivate = await tx
+    const toActivate = await db
       .select()
       .from(reservationsTable)
       .where(
@@ -29,11 +28,11 @@ export async function processReservationTransitions(now: Date = new Date()) {
 
     if (stillUpcoming.length > 0) {
       const ids = stillUpcoming.map((r) => r.id);
-      await tx
+      await db
         .update(reservationsTable)
         .set({ status: "active" })
         .where(inArray(reservationsTable.id, ids));
-      await tx
+      await db
         .update(spotsTable)
         .set({ status: "occupied" })
         .where(
@@ -45,7 +44,7 @@ export async function processReservationTransitions(now: Date = new Date()) {
       activated = stillUpcoming.length;
     }
 
-    const toComplete = await tx
+    const toComplete = await db
       .select()
       .from(reservationsTable)
       .where(
@@ -61,12 +60,12 @@ export async function processReservationTransitions(now: Date = new Date()) {
 
     if (completeAll.length > 0) {
       const ids = completeAll.map((r) => r.id);
-      await tx
+      await db
         .update(reservationsTable)
         .set({ status: "completed" })
         .where(inArray(reservationsTable.id, ids));
 
-      const existingTx = await tx
+      const existingTx = await db
         .select({ reservationId: transactionsTable.reservationId })
         .from(transactionsTable)
         .where(inArray(transactionsTable.reservationId, ids));
@@ -84,17 +83,12 @@ export async function processReservationTransitions(now: Date = new Date()) {
           status: "paid" as const,
         }));
       if (newTx.length > 0) {
-        await tx.insert(transactionsTable).values(newTx);
+        await db.insert(transactionsTable).values(newTx);
       }
 
       const spotIds = Array.from(new Set(completeAll.map((r) => r.spotId)));
 
-      // For each affected spot, decide its new status:
-      //   - "occupied" if any other reservation currently overlaps now
-      //     (active, OR upcoming whose startTime has already arrived)
-      //   - "reserved" if no current occupancy but a future reservation exists
-      //   - "available" otherwise
-      const liveOnSameSpots = await tx
+      const liveOnSameSpots = await db
         .select({
           spotId: reservationsTable.spotId,
           status: reservationsTable.status,
@@ -116,7 +110,7 @@ export async function processReservationTransitions(now: Date = new Date()) {
         );
       const occupiedSpots = new Set(liveOnSameSpots.map((r) => r.spotId));
 
-      const futureOnSameSpots = await tx
+      const futureOnSameSpots = await db
         .select({ spotId: reservationsTable.spotId })
         .from(reservationsTable)
         .where(
@@ -138,19 +132,19 @@ export async function processReservationTransitions(now: Date = new Date()) {
         else availableIds.push(id);
       }
       if (occupiedIds.length > 0) {
-        await tx
+        await db
           .update(spotsTable)
           .set({ status: "occupied" })
           .where(inArray(spotsTable.id, occupiedIds));
       }
       if (reservedIds.length > 0) {
-        await tx
+        await db
           .update(spotsTable)
           .set({ status: "reserved" })
           .where(inArray(spotsTable.id, reservedIds));
       }
       if (availableIds.length > 0) {
-        await tx
+        await db
           .update(spotsTable)
           .set({ status: "available" })
           .where(inArray(spotsTable.id, availableIds));
@@ -159,7 +153,6 @@ export async function processReservationTransitions(now: Date = new Date()) {
     }
 
     return { activated, completed };
-  });
 }
 
 let timer: NodeJS.Timeout | null = null;
