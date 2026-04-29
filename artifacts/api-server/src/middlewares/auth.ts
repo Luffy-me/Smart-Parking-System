@@ -43,57 +43,50 @@ async function loadOrCreateUser(
     email = null;
   }
 
-  return db.transaction(async (tx) => {
-    // Serialize bootstrap role assignment so only one first-time user can become operator.
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtext('users_bootstrap_operator_role'))`,
-    );
-
-    const [alreadyExists] = await tx
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, userId));
-    if (alreadyExists) {
-      return {
-        id: alreadyExists.id,
-        role: alreadyExists.role as UserRole,
-        email: alreadyExists.email,
-      };
-    }
-
-    // First user becomes the operator; everyone else is a driver.
-    const [{ count }] = await tx
-      .select({ count: sql<number>`count(*)::int` })
-      .from(usersTable);
-    const role: UserRole = count === 0 ? "operator" : "driver";
-
-    const [inserted] = await tx
-      .insert(usersTable)
-      .values({ id: userId, role, email })
-      .onConflictDoNothing()
-      .returning();
-
-    if (inserted) {
-      return {
-        id: inserted.id,
-        role: inserted.role as UserRole,
-        email: inserted.email,
-      };
-    }
-
-    const [fallback] = await tx
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, userId));
-    if (!fallback) {
-      throw new Error("Failed to create or load user record");
-    }
+  const [alreadyExists] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+  if (alreadyExists) {
     return {
-      id: fallback.id,
-      role: fallback.role as UserRole,
-      email: fallback.email,
+      id: alreadyExists.id,
+      role: alreadyExists.role as UserRole,
+      email: alreadyExists.email,
     };
-  });
+  }
+
+  // First user becomes the operator; everyone else is a driver.
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(usersTable);
+  const role: UserRole = count === 0 ? "operator" : "driver";
+
+  const [inserted] = await db
+    .insert(usersTable)
+    .values({ id: userId, role, email })
+    .onConflictDoNothing()
+    .returning();
+
+  if (inserted) {
+    return {
+      id: inserted.id,
+      role: inserted.role as UserRole,
+      email: inserted.email,
+    };
+  }
+
+  const [fallback] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+  if (!fallback) {
+    throw new Error("Failed to create or load user record");
+  }
+  return {
+    id: fallback.id,
+    role: fallback.role as UserRole,
+    email: fallback.email,
+  };
 }
 
 export const requireAuth: RequestHandler = async (

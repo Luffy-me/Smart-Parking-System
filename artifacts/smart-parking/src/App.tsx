@@ -5,6 +5,7 @@ import {
   SignUp,
   Show,
   useClerk,
+  useAuth,
 } from "@clerk/react";
 import {
   Switch,
@@ -21,6 +22,7 @@ import {
 import {
   useGetCurrentUser,
   type CurrentUser,
+  setAuthTokenGetter,
 } from "@workspace/api-client-react";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
@@ -184,6 +186,23 @@ function ClerkQueryClientCacheInvalidator() {
     });
     return unsubscribe;
   }, [addListener, qc]);
+
+  return null;
+}
+
+function ClerkApiAuthSync() {
+  const { getToken } = useAuth();
+  
+  useEffect(() => {
+    setAuthTokenGetter(async () => {
+      try {
+        return await getToken();
+      } catch (err) {
+        return null;
+      }
+    });
+    return () => setAuthTokenGetter(null);
+  }, [getToken]);
 
   return null;
 }
@@ -375,6 +394,7 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <ClerkApiAuthSync />
         <ThemeProvider>
           <I18nProvider>
             <TooltipProvider>
