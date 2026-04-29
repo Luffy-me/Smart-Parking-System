@@ -14,7 +14,7 @@ import {
   Sun,
   Moon,
   LogOut,
-  Zap,
+
   BarChart3,
   Tag,
   Settings,
@@ -40,7 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/map", labelKey: "nav.map", icon: Map },
   { href: "/reservations", labelKey: "nav.reservations", icon: CalendarRange },
   { href: "/vehicles", labelKey: "nav.vehicles", icon: CarFront },
-  { href: "/ev-charging", labelKey: "nav.evCharging", icon: Zap },
+
   { href: "/analytics", labelKey: "nav.analytics", icon: BarChart3, operatorOnly: true },
   { href: "/transactions", labelKey: "nav.transactions", icon: Receipt },
   { href: "/spots", labelKey: "nav.spots", icon: Settings2, operatorOnly: true },

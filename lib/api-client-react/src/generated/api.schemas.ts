@@ -37,7 +37,6 @@ export const SpotType = {
   standard: "standard",
   compact: "compact",
   accessible: "accessible",
-  ev: "ev",
   motorcycle: "motorcycle",
 } as const;
 

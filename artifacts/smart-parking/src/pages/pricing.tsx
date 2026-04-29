@@ -29,7 +29,7 @@ export default function Pricing() {
       annual: 159,
       cta: t("common.getStarted"),
       featured: true,
-      features: ["Up to 500 spots", "EV charging module", "Advanced analytics & exports", "5 operator seats", "Priority support", "Custom branding"],
+      features: ["Up to 500 spots", "Advanced analytics & exports", "5 operator seats", "Priority support", "Custom branding", "API access"],
     },
     {
       name: "Enterprise",

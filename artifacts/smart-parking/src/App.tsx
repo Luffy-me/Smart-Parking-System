@@ -40,7 +40,7 @@ import Reservations from "@/pages/reservations";
 import Vehicles from "@/pages/vehicles";
 import Transactions from "@/pages/transactions";
 import SpotsAdmin from "@/pages/spots";
-import EVCharging from "@/pages/ev-charging";
+
 import Analytics from "@/pages/analytics";
 import Pricing from "@/pages/pricing";
 import SettingsPage from "@/pages/settings";
@@ -309,7 +309,7 @@ function ProtectedRoutes() {
             <Route path="/spots">
               <ProtectedApp operatorOnly>{() => <SpotsAdmin />}</ProtectedApp>
             </Route>
-            <Route path="/ev-charging" component={EVCharging} />
+
             <Route path="/analytics">
               <ProtectedApp operatorOnly>{() => <Analytics />}</ProtectedApp>
             </Route>

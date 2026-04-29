@@ -38,7 +38,7 @@ export const ListSpotsResponseItem = zod.object({
   code: zod.string(),
   zone: zod.string(),
   level: zod.number(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   status: zod.enum(["available", "occupied", "reserved", "maintenance"]),
   hourlyRate: zod.number(),
   createdAt: zod.coerce.date(),
@@ -52,7 +52,7 @@ export const CreateSpotBody = zod.object({
   code: zod.string(),
   zone: zod.string(),
   level: zod.number(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   hourlyRate: zod.number(),
   status: zod
     .enum(["available", "occupied", "reserved", "maintenance"])
@@ -68,7 +68,7 @@ export const GetSpotResponse = zod.object({
   code: zod.string(),
   zone: zod.string(),
   level: zod.number(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   status: zod.enum(["available", "occupied", "reserved", "maintenance"]),
   hourlyRate: zod.number(),
   createdAt: zod.coerce.date(),
@@ -83,7 +83,7 @@ export const UpdateSpotBody = zod.object({
   zone: zod.string().optional(),
   level: zod.number().optional(),
   type: zod
-    .enum(["standard", "compact", "accessible", "ev", "motorcycle"])
+    .enum(["standard", "compact", "accessible", "motorcycle"])
     .optional(),
   hourlyRate: zod.number().optional(),
   status: zod
@@ -96,7 +96,7 @@ export const UpdateSpotResponse = zod.object({
   code: zod.string(),
   zone: zod.string(),
   level: zod.number(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   status: zod.enum(["available", "occupied", "reserved", "maintenance"]),
   hourlyRate: zod.number(),
   createdAt: zod.coerce.date(),
@@ -182,7 +182,7 @@ export const ListVehiclesResponseItem = zod.object({
   make: zod.string(),
   model: zod.string(),
   color: zod.string(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   ownerName: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
@@ -193,7 +193,7 @@ export const CreateVehicleBody = zod.object({
   make: zod.string(),
   model: zod.string(),
   color: zod.string(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   ownerName: zod.string().optional(),
 });
 
@@ -207,7 +207,7 @@ export const GetVehicleResponse = zod.object({
   make: zod.string(),
   model: zod.string(),
   color: zod.string(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   ownerName: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
@@ -221,7 +221,7 @@ export const UpdateVehicleBody = zod.object({
   make: zod.string(),
   model: zod.string(),
   color: zod.string(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   ownerName: zod.string().optional(),
 });
 
@@ -231,7 +231,7 @@ export const UpdateVehicleResponse = zod.object({
   make: zod.string(),
   model: zod.string(),
   color: zod.string(),
-  type: zod.enum(["standard", "compact", "accessible", "ev", "motorcycle"]),
+  type: zod.enum(["standard", "compact", "accessible", "motorcycle"]),
   ownerName: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });

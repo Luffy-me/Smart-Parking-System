@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   Map,
   CalendarRange,
-  Zap,
   BarChart3,
   ShieldCheck,
   ArrowRight,
@@ -191,8 +190,8 @@ export default function Landing() {
               <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2">
                 {[
                   { i: Map, l: t("marketing.featureLive") },
-                  { i: Zap, l: t("marketing.featureEv") },
                   { i: BarChart3, l: t("marketing.featureInsights") },
+                  { i: CalendarRange, l: "Reservations" },
                 ].map(({ i: Icon, l }) => (
                   <div
                     key={l}
@@ -245,7 +244,7 @@ export default function Landing() {
           <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { icon: Map, title: t("hero.f1Title"), body: t("hero.f1Body") },
-              { icon: Zap, title: t("hero.f2Title"), body: t("hero.f2Body") },
+              { icon: CalendarRange, title: t("hero.f2Title"), body: t("hero.f2Body") },
               { icon: BarChart3, title: t("hero.f3Title"), body: t("hero.f3Body") },
               { icon: ShieldCheck, title: t("hero.f4Title"), body: t("hero.f4Body") },
             ].map((f, i) => (

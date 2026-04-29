@@ -14,7 +14,6 @@ const HOURLY = Array.from({ length: 24 }, (_, h) => ({
 
 const DURATION_BY_TYPE = [
   { type: "Standard", minutes: 84 },
-  { type: "EV", minutes: 112 },
   { type: "Compact", minutes: 67 },
   { type: "Accessible", minutes: 96 },
   { type: "Motorcycle", minutes: 41 },

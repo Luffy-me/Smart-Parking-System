@@ -245,7 +245,6 @@ function SpotForm({ spotId, onSuccess }: { spotId?: string, onSuccess: () => voi
             <SelectContent>
               <SelectItem value="standard">Standard</SelectItem>
               <SelectItem value="compact">Compact</SelectItem>
-              <SelectItem value="ev">EV</SelectItem>
               <SelectItem value="accessible">Accessible</SelectItem>
               <SelectItem value="motorcycle">Motorcycle</SelectItem>
             </SelectContent>

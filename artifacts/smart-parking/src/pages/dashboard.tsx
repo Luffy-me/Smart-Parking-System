@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { Car, Map, CalendarRange, DollarSign, Activity, AlertCircle, Flame, TrendingUp, Zap } from "lucide-react";
+import { Car, Map, CalendarRange, DollarSign, Activity, AlertCircle, Flame, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
@@ -265,7 +265,6 @@ export default function Dashboard() {
           {[
             { icon: Flame, tone: "primary", title: t("metrics.peakHour"), value: "18:00", body: t("alerts.peakBody") },
             { icon: AlertCircle, tone: "destructive", title: t("alerts.maintenanceOverdue"), value: `${t("slotGrid.zone")} C`, body: t("alerts.maintenanceBody") },
-            { icon: Zap, tone: "chart-2", title: t("alerts.evSurge"), value: "+34%", body: t("alerts.evSurgeBody") },
             { icon: TrendingUp, tone: "primary", title: t("metrics.avgDuration"), value: "84m", body: t("alerts.durationBody") },
           ].map((a, i) => (
             <motion.div key={a.title} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover-elevate">

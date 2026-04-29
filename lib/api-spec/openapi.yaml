@@ -384,7 +384,7 @@ components:
 
     SpotType:
       type: string
-      enum: [standard, compact, accessible, ev, motorcycle]
+      enum: [standard, compact, accessible, motorcycle]
 
     Spot:
       type: object
