@@ -123,9 +123,8 @@ export function AppShell({
       >
         {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </Button>
-      <Button variant="ghost" size="icon" className="relative h-9 w-9">
+      <Button variant="ghost" size="icon" className="relative h-9 w-9" title="Notifications coming soon" aria-label="Notifications">
         <Bell className="h-5 w-5 text-muted-foreground" />
-        <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary border-2 border-background" />
       </Button>
     </div>
   );

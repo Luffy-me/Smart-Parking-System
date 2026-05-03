@@ -248,7 +248,7 @@ router.post("/reservations", requireAuth, async (req, res) => {
     }
 
     return [inserted];
-  });
+  }, { isolationLevel: "serializable" });
 
   if (!row) {
     if (createConflict) {
@@ -357,7 +357,7 @@ router.patch("/reservations/:id", requireAuth, async (req, res) => {
 
     await recomputeSpotStatus(tx, updated.spotId, updated.id);
     return [updated];
-  });
+  }, { isolationLevel: "serializable" });
 
   if (!row) {
     if (updateConflict) {
@@ -394,7 +394,7 @@ router.delete("/reservations/:id", requireAuth, async (req, res) => {
     }
 
     await recomputeSpotStatus(tx, updated.spotId, updated.id);
-  });
+  }, { isolationLevel: "serializable" });
 
   res.status(204).end();
 });

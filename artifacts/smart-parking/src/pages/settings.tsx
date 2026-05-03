@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,16 +12,58 @@ import { motion } from "framer-motion";
 import { User, Bell, SlidersHorizontal, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
+const SETTINGS_STORAGE_KEY = "parq.settings";
+
+interface PersistedSettings {
+  emailAlerts: boolean;
+  pushAlerts: boolean;
+  smsAlerts: boolean;
+  org: string;
+  tz: string;
+  currency: string;
+}
+
+const DEFAULT_SETTINGS: PersistedSettings = {
+  emailAlerts: true,
+  pushAlerts: true,
+  smsAlerts: false,
+  org: "Parq Operations",
+  tz: "Europe/Moscow",
+  currency: "USD",
+};
+
+function loadSettings(): PersistedSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (raw) {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return DEFAULT_SETTINGS;
+}
+
 export default function SettingsPage() {
   const { t, lang, setLang } = useI18n();
   const { theme, setTheme } = useTheme();
   const { data: user } = useGetCurrentUser();
-  const [email, setEmail] = useState(true);
-  const [push, setPush] = useState(true);
-  const [sms, setSms] = useState(false);
-  const [org, setOrg] = useState("Parq Operations");
-  const [tz, setTz] = useState("Europe/Moscow");
-  const [currency, setCurrency] = useState("USD");
+
+  const [settings, setSettings] = useState<PersistedSettings>(loadSettings);
+
+  const updateField = useCallback(<K extends keyof PersistedSettings>(key: K, value: PersistedSettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleSave = useCallback(() => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    toast.success("Settings saved");
+  }, [settings]);
+
+  // Load settings on mount
+  useEffect(() => {
+    setSettings(loadSettings());
+  }, []);
 
   const sections = [
     {
@@ -67,14 +109,14 @@ export default function SettingsPage() {
       title: t("settings.notifications"),
       content: (
         <div className="divide-y">
-          {[
-            { label: t("settings.emailAlerts"), value: email, set: setEmail },
-            { label: t("settings.pushAlerts"), value: push, set: setPush },
-            { label: t("settings.smsAlerts"), value: sms, set: setSms },
-          ].map((row) => (
-            <div key={row.label} className="flex items-center justify-between py-3">
+          {([
+            { label: t("settings.emailAlerts"), key: "emailAlerts" as const },
+            { label: t("settings.pushAlerts"), key: "pushAlerts" as const },
+            { label: t("settings.smsAlerts"), key: "smsAlerts" as const },
+          ] as const).map((row) => (
+            <div key={row.key} className="flex items-center justify-between py-3">
               <span className="text-sm font-medium">{row.label}</span>
-              <Switch checked={row.value} onCheckedChange={row.set} />
+              <Switch checked={settings[row.key]} onCheckedChange={(v) => updateField(row.key, v)} />
             </div>
           ))}
         </div>
@@ -85,10 +127,10 @@ export default function SettingsPage() {
       title: t("settings.operatorProfile"),
       content: (
         <div className="grid sm:grid-cols-3 gap-4">
-          <div className="space-y-2 sm:col-span-3"><Label>{t("settings.organizationName")}</Label><Input value={org} onChange={(e) => setOrg(e.target.value)} /></div>
+          <div className="space-y-2 sm:col-span-3"><Label>{t("settings.organizationName")}</Label><Input value={settings.org} onChange={(e) => updateField("org", e.target.value)} /></div>
           <div className="space-y-2">
             <Label>{t("settings.timezone")}</Label>
-            <Select value={tz} onValueChange={setTz}>
+            <Select value={settings.tz} onValueChange={(v) => updateField("tz", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Europe/Moscow">Europe/Moscow</SelectItem>
@@ -100,7 +142,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label>{t("settings.currency")}</Label>
-            <Select value={currency} onValueChange={setCurrency}>
+            <Select value={settings.currency} onValueChange={(v) => updateField("currency", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="USD">USD $</SelectItem>
@@ -122,7 +164,7 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold tracking-tight">{t("pages.settingsTitle")}</h1>
           <p className="text-muted-foreground mt-1">{t("pages.settingsSubtitle")}</p>
         </div>
-        <Button onClick={() => toast.success("Settings saved")}>{t("settings.save")}</Button>
+        <Button onClick={handleSave}>{t("settings.save")}</Button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 max-w-4xl">

@@ -50,3 +50,11 @@ Thumbs.db
 
 # Environment variables
 .env
+.env.local
+.env.*.local
+artifacts/api-server/.env
+artifacts/smart-parking/.env.local
+
+# Replit artifacts
+.replit-artifact/
+**/.replit-artifact/

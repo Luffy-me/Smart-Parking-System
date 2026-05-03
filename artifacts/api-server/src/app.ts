@@ -5,6 +5,8 @@ import express, {
   type Response,
 } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import {
@@ -27,6 +29,19 @@ function isValidationError(
   );
 }
 
+// ---------------------------------------------------------------------------
+// Security headers
+// ---------------------------------------------------------------------------
+app.use(
+  helmet({
+    // Relax CSP in development so Vite HMR and inline styles work.
+    contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Request logging
+// ---------------------------------------------------------------------------
 app.use(
   pinoHttp({
     logger,
@@ -47,8 +62,14 @@ app.use(
   }),
 );
 
+// ---------------------------------------------------------------------------
+// Clerk frontend API proxy (must be BEFORE express.json())
+// ---------------------------------------------------------------------------
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
+// ---------------------------------------------------------------------------
+// CORS
+// ---------------------------------------------------------------------------
 const configuredCorsOrigins = (process.env.CORS_ORIGINS ?? "")
   .split(",")
   .map((origin) => origin.trim())
@@ -83,13 +104,40 @@ app.use(
     },
   }),
 );
+
+// ---------------------------------------------------------------------------
+// Body parsers
+// ---------------------------------------------------------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ---------------------------------------------------------------------------
+// Rate limiting
+// ---------------------------------------------------------------------------
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 60_000,
+    max: 100,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: { error: "Too many requests, please try again later." },
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Clerk auth middleware
+// ---------------------------------------------------------------------------
 app.use(clerkMiddleware());
 
+// ---------------------------------------------------------------------------
+// API routes
+// ---------------------------------------------------------------------------
 app.use("/api", router);
 
+// ---------------------------------------------------------------------------
+// Global error handler
+// ---------------------------------------------------------------------------
 app.use(
   (
     err: unknown,

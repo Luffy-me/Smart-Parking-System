@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { db, vehiclesTable } from "@workspace/db";
-import { eq, desc, and } from "drizzle-orm";
+import { db, vehiclesTable, reservationsTable } from "@workspace/db";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import {
   CreateVehicleBody,
   GetVehicleParams,
@@ -125,6 +125,26 @@ router.delete("/vehicles/:id", requireAuth, async (req, res) => {
     res.status(404).json({ error: "Vehicle not found" });
     return;
   }
+
+  // Prevent deletion if vehicle has active or upcoming reservations
+  const [liveReservation] = await db
+    .select({ id: reservationsTable.id })
+    .from(reservationsTable)
+    .where(
+      and(
+        eq(reservationsTable.vehicleId, id),
+        inArray(reservationsTable.status, ["active", "upcoming"]),
+      ),
+    )
+    .limit(1);
+
+  if (liveReservation) {
+    res.status(409).json({
+      error: "Cannot delete vehicle with active or upcoming reservations. Cancel them first.",
+    });
+    return;
+  }
+
   await db.delete(vehiclesTable).where(eq(vehiclesTable.id, id));
   res.status(204).end();
 });

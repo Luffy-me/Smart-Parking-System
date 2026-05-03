@@ -262,12 +262,48 @@ export default function Dashboard() {
           <CardTitle className="flex items-center gap-2"><AlertCircle className="h-5 w-5 text-primary" /> {t("metrics.alerts")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[
-            { icon: Flame, tone: "primary", title: t("metrics.peakHour"), value: "18:00", body: t("alerts.peakBody") },
-            { icon: AlertCircle, tone: "destructive", title: t("alerts.maintenanceOverdue"), value: `${t("slotGrid.zone")} C`, body: t("alerts.maintenanceBody") },
-            { icon: TrendingUp, tone: "primary", title: t("metrics.avgDuration"), value: "84m", body: t("alerts.durationBody") },
-          ].map((a, i) => (
-            <motion.div key={a.title} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover-elevate">
+          {(() => {
+            const alerts = [];
+            if (summary) {
+              const pct = (summary.utilizationRate * 100).toFixed(0);
+              alerts.push({
+                icon: Flame,
+                tone: Number(pct) > 80 ? "destructive" : "primary",
+                title: t("metrics.utilization"),
+                value: `${pct}%`,
+                body: Number(pct) > 80 ? t("alerts.peakBody") : t("alerts.durationBody"),
+              });
+            }
+            if (summary && summary.maintenanceSpots > 0) {
+              alerts.push({
+                icon: AlertCircle,
+                tone: "destructive",
+                title: t("alerts.maintenanceOverdue"),
+                value: `${summary.maintenanceSpots} spot(s)`,
+                body: t("alerts.maintenanceBody"),
+              });
+            }
+            if (summary) {
+              alerts.push({
+                icon: TrendingUp,
+                tone: "primary",
+                title: t("metrics.activeReservations"),
+                value: `${summary.activeReservations}`,
+                body: `${summary.reservedSpots} spots reserved out of ${summary.totalSpots} total.`,
+              });
+            }
+            if (alerts.length === 0) {
+              alerts.push({
+                icon: TrendingUp,
+                tone: "primary",
+                title: t("metrics.alerts"),
+                value: "—",
+                body: "No alerts at this time.",
+              });
+            }
+            return alerts;
+          })().map((a, i) => (
+            <motion.div key={a.title + i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover-elevate">
               <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0`} style={{ backgroundColor: `hsl(var(--${a.tone}) / .12)`, color: `hsl(var(--${a.tone}))` }}>
                 <a.icon className="h-4 w-4" />
               </div>

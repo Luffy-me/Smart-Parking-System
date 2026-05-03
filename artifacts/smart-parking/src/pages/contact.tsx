@@ -114,6 +114,10 @@ export default function Contact() {
             <div className="mb-6">
               <h2 className="text-xl font-bold tracking-tight">{t("contact.formTitle")}</h2>
               <p className="text-sm text-muted-foreground mt-1">{t("contact.formSubtitle")}</p>
+              <div className="mt-4 rounded-md bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <p><strong>Demo Mode:</strong> The contact form is a functional UI mockup and does not actually send emails at this time.</p>
+              </div>
             </div>
 
             <AnimatePresence mode="wait">

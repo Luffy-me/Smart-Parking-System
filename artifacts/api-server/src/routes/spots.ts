@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { db, spotsTable } from "@workspace/db";
-import { eq, and, asc } from "drizzle-orm";
+import { db, spotsTable, reservationsTable } from "@workspace/db";
+import { eq, and, asc, inArray } from "drizzle-orm";
 import {
   ListSpotsQueryParams,
   CreateSpotBody,
@@ -86,6 +86,26 @@ router.patch("/spots/:id", requireAuth, requireOperator, async (req, res) => {
 
 router.delete("/spots/:id", requireAuth, requireOperator, async (req, res) => {
   const { id } = DeleteSpotParams.parse(req.params);
+
+  // Prevent deletion if spot has active or upcoming reservations
+  const [liveReservation] = await db
+    .select({ id: reservationsTable.id })
+    .from(reservationsTable)
+    .where(
+      and(
+        eq(reservationsTable.spotId, id),
+        inArray(reservationsTable.status, ["active", "upcoming"]),
+      ),
+    )
+    .limit(1);
+
+  if (liveReservation) {
+    res.status(409).json({
+      error: "Cannot delete spot with active or upcoming reservations. Cancel them first.",
+    });
+    return;
+  }
+
   await db.delete(spotsTable).where(eq(spotsTable.id, id));
   res.status(204).end();
 });

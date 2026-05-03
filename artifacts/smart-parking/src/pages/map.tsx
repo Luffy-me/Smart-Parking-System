@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Car, Clock, Zap, Settings, ShieldCheck, Accessibility, Bike, CalendarRange, DollarSign, GraduationCap } from "lucide-react";
+import { MapPin, Car, Clock, Settings, ShieldCheck, Accessibility, Bike, CalendarRange, DollarSign, GraduationCap } from "lucide-react";
 import type { Spot } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -39,9 +39,8 @@ const STATUS_COLORS: Record<SpotStatus, string> = {
 
 const TYPE_ICONS: Record<SpotType, React.ElementType> = {
   standard: Car,
-  compact: Car, // Maybe a smaller icon
+  compact: Car,
   accessible: Accessibility,
-  ev: Zap,
   motorcycle: Bike
 };
 
@@ -229,7 +228,7 @@ function SlotGrid({ spots, onSelect, selectedSpotId }: { spots: Spot[]; onSelect
                     status === "reserved" ? "bg-amber-500/10 border-amber-500/70 text-amber-700 dark:text-amber-300 soft-pulse" :
                     status === "occupied" ? "bg-destructive border-destructive text-destructive-foreground" :
                     "bg-muted border-muted-foreground/30 text-muted-foreground/70";
-                  const ring = type === "ev" ? "ring-2 ring-emerald-400/70 ring-offset-1 ring-offset-background" : "";
+                  const ring = "";
                   const sel = isSelected ? "scale-110 z-10 shadow-lg" : "";
                   return (
                     <motion.button
@@ -245,7 +244,7 @@ function SlotGrid({ spots, onSelect, selectedSpotId }: { spots: Spot[]; onSelect
                     >
                       <span className="leading-none">{s.code.replace(/[^0-9]/g, "").slice(-2) || s.code.slice(-2)}</span>
                       {type === "accessible" && <Accessibility className="absolute -top-1 -right-1 h-3 w-3 text-blue-500 bg-background rounded-full p-px" />}
-                      {type === "ev" && <Zap className="absolute -top-1 -right-1 h-3 w-3 text-emerald-500 bg-background rounded-full p-px" />}
+
                     </motion.button>
                   );
                 })}

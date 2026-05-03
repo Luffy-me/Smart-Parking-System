@@ -1,10 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import type { Spot, SpotStatus } from "@workspace/api-client-react";
 
+// Yandex Maps API type stubs — these are intentionally loose since we don't
+// have full type definitions for the Yandex Maps 2.1 API.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type YmapsApi = {
+  Map: new (container: HTMLElement, options: Record<string, unknown>) => YmapsMap;
+  Placemark: new (coords: [number, number], props: Record<string, unknown>, opts: Record<string, unknown>) => YmapsPlacemark;
+  ready: (cb: () => void) => void;
+};
+type YmapsMap = {
+  geoObjects: { add: (pm: YmapsPlacemark) => void; remove: (pm: YmapsPlacemark) => void };
+  destroy: () => void;
+};
+type YmapsPlacemark = {
+  geometry: { setCoordinates: (coords: [number, number]) => void };
+  properties: { set: (props: Record<string, unknown>) => void };
+  options: { set: (opts: Record<string, unknown>) => void };
+  events: { add: (event: string, handler: () => void) => void };
+};
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 declare global {
   interface Window {
-    ymaps?: any;
-    __ymapsLoader?: Promise<any>;
+    ymaps?: YmapsApi;
+    __ymapsLoader?: Promise<YmapsApi>;
   }
 }
 
@@ -56,16 +76,16 @@ function spotCoord(spot: Spot): [number, number] {
   return [zoneLat + dLat, zoneLng + dLng];
 }
 
-function loadYmaps(apiKey: string): Promise<any> {
+function loadYmaps(apiKey: string): Promise<YmapsApi> {
   if (typeof window === "undefined") return Promise.reject(new Error("no window"));
   if (window.ymaps && window.ymaps.Map) return Promise.resolve(window.ymaps);
   if (window.__ymapsLoader) return window.__ymapsLoader;
 
-  window.__ymapsLoader = new Promise((resolve, reject) => {
+  window.__ymapsLoader = new Promise<YmapsApi>((resolve, reject) => {
     const existing = document.querySelector<HTMLScriptElement>("script[data-ymaps]");
     const onReady = () => {
       if (window.ymaps && typeof window.ymaps.ready === "function") {
-        window.ymaps.ready(() => resolve(window.ymaps));
+        window.ymaps.ready(() => resolve(window.ymaps!));
       } else {
         reject(new Error("Yandex Maps API failed to initialise"));
       }
@@ -95,8 +115,8 @@ interface YandexMapProps {
 
 export function YandexMap({ spots, selectedSpotId, onSelect }: YandexMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const placemarksRef = useRef<Map<string, any>>(new Map());
+  const mapRef = useRef<YmapsMap | null>(null);
+  const placemarksRef = useRef<Map<string, YmapsPlacemark>>(new Map());
   const onSelectRef = useRef(onSelect);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);

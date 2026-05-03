@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ClerkProvider,
   SignIn,
@@ -62,11 +62,7 @@ function stripBase(path: string): string {
     : path;
 }
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { refetchOnWindowFocus: false, retry: false },
-  },
-});
+
 
 const clerkAppearance = {
   options: {
@@ -135,8 +131,6 @@ const clerkElementStyles = {
 };
 
 function SignInPage() {
-  // To update login providers, app branding, or OAuth settings use the Auth
-  // pane in the workspace toolbar. More information can be found in the Replit docs.
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md">
@@ -152,8 +146,6 @@ function SignInPage() {
 }
 
 function SignUpPage() {
-  // To update login providers, app branding, or OAuth settings use the Auth
-  // pane in the workspace toolbar. More information can be found in the Replit docs.
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md">
@@ -369,6 +361,14 @@ function AppRoutes() {
 
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { refetchOnWindowFocus: false, retry: false },
+        },
+      }),
+  );
 
   return (
     <ClerkProvider
